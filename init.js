@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 
 function createWindow () {
+
   const windowStateKeeper = require('electron-window-state');
 
   let mainWindowState = windowStateKeeper({
@@ -9,6 +10,7 @@ function createWindow () {
   });
   // Create the browser window.
   let win = new BrowserWindow({
+    devTools: true,
     show: false,
     backgroundColor: "#888",
     x: mainWindowState.x,
@@ -21,7 +23,7 @@ function createWindow () {
     webPreferences: {
       enableRemoteModule: true,
       nodeIntegration: true,
-      spellcheck: true
+      spellcheck: false
     }
   })
 

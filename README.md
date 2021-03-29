@@ -1,2 +1,3 @@
-# Scummy
-## A ScummVM Front-End.
+# Scummy: A SCUMMVM front end.
+
+Scummy is a modern, clean UI for managing SCUMMVM games.
