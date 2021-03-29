@@ -11,5 +11,20 @@ html {
 .sideBar {
   background-color: #1B262C;
   width: 300px;
-  height: 100vh;
+  height: calc(100vh - 32px);
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mainMenuBar {
+  margin-left: 300px;
+  background: red;
+  display: inline-block;
+  width: calc(100vw - 300px);
+}
+
+.main {
+
 }
