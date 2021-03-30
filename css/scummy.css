@@ -11,18 +11,66 @@ html {
 .sideBar {
   background-color: #1B262C;
   width: 300px;
-  height: calc(100vh - 32px);
+  height: 100%;
   display: inline-block;
   position: absolute;
   top: 0;
   left: 0;
 }
 
+.sideBarItem {
+  margin-left: 30px;
+  padding: 5px 0;
+  font-family: sans-serif;
+  font-size: 15px;
+  color: white;
+  opacity: 0.8;
+}
+
+.sideBarItem.selected {
+  opacity: 1.0;
+}
+
+.sideBarItem.selected > i {
+  opacity: 1.0;
+}
+
+.sideBarItem:hover > i {
+  opacity: 1.0;
+}
+
+.sideBarItem i {
+  opacity: 0.5;
+  padding-right: 5px;
+}
+
+#sideBarCategories {
+  margin-top: 30px;
+}
+
 .mainMenuBar {
   margin-left: 300px;
-  background: red;
+  position: absolute;
   display: inline-block;
-  width: calc(100vw - 300px);
+  right: 30px;
+  padding: 10px 20px;
+}
+
+.menuButton {
+  font-size: 20px;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 5px 15px;
+  text-align: center;
+  color: #1B262C;
+  background-color: rgba(27, 39, 45, 0.5);
+  margin: auto 5px;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.menuButton:hover {
+  color: #fff;
+  background-color: #1B262C;
 }
 
 .main {

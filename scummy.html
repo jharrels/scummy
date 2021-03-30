@@ -8,10 +8,27 @@
     <link rel="stylesheet" href="css/all.css" />
     <link rel="stylesheet" href="css/scummy.css" />
   </head>
-  <div class="sideBar"></div>
+  <div class="sideBar">
+    <div class="sideBarItem">
+      <i class="fas fa-clock fa-fw"></i>Recent
+    </div>
+    <div class="sideBarItem selected">
+      <i class="fas fa-layer-group fa-fw"></i>All
+    </div>
+    <div id="sideBarCategories"></div>
+    <div class="sideBarItem">
+      <i class="fas fa-bookmark fa-fw"></i>Other Games
+    </div>
+  </div>
   <div class="mainMenuBar">
-    <i class="fas fa-th-large fa-fw"></i> Um
+    <div class="menuButton">
+      <i class="fas fa-th-list fa-fw"></i>
+    </div>
+    <div class="menuButton">
+      <i class="fas fa-th-large fa-fw"></i>
+    </div>
   </div>
   <script>let $ = require('jquery');</script>
+  <script src="js/gamedata.js"></script>
   <script src="js/scummy.js"></script>
 </html>

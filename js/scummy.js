@@ -15,7 +15,17 @@ var devMode = true;
 //Menu.setApplicationMenu(null);
 
 let titlebar = new customTitlebar.Titlebar({
-  backgroundColor: customTitlebar.Color.fromHex('#000'),
+  backgroundColor: customTitlebar.Color.fromHex('#1B262C'),
   menu: null,
   overflow: "hidden"
 });
+
+drawCategories();
+
+function drawCategories() {
+  Object.keys(categories).sort().forEach(key => {
+    let tmpIcon = $("<i></i>", {"class": "fas fa-bookmark fa-fw"});
+    let tmpObject = $("<div></div>", {"class":"sideBarItem", "id":key}).text(categories[key]).prepend(tmpIcon);
+    $("#sideBarCategories").append(tmpObject);
+  });
+}
