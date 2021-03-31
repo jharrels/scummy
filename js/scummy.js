@@ -22,6 +22,18 @@ let titlebar = new customTitlebar.Titlebar({
 
 drawCategories();
 
+$(".sideBar").on("mouseenter", () => {
+  $(".sideBar").addClass("hasScrollBar");
+}).on("mouseleave", () => {
+  $(".sideBar").removeClass("hasScrollBar");
+});
+
+$(".main").on("mouseenter", () => {
+  $(".main").addClass("hasScrollBar");
+}).on("mouseleave", () => {
+  $(".main").removeClass("hasScrollBar");
+});
+
 function drawCategories() {
   Object.keys(categories).sort().forEach(key => {
     let tmpIcon = $("<i></i>", {"class": "fas fa-bookmark fa-fw"});

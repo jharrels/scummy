@@ -1,6 +1,6 @@
 body,
 html {
-    background-color: #BBE1FA;
+    background-color: #1b262c;
     margin: 0px;
     padding: 0px;
     height: 100%;
@@ -16,6 +16,16 @@ html {
   position: absolute;
   top: 0;
   left: 0;
+  overflow-y: scroll;
+}
+
+.sideBarHeader {
+  margin-left: 30px;
+  padding: 5px 0;
+  font-family: sans-serif;
+  font-size: 17px;
+  color: white;
+  opacity: 0.2;
 }
 
 .sideBarItem {
@@ -48,11 +58,17 @@ html {
   margin-top: 30px;
 }
 
-.mainMenuBar {
-  margin-left: 300px;
+.rightMenuBar {
   position: absolute;
   display: inline-block;
   right: 30px;
+  padding: 10px 20px;
+}
+
+.leftMenuBar {
+  position: absolute;
+  display: inline-block;
+  left: 330px;
   padding: 10px 20px;
 }
 
@@ -74,5 +90,53 @@ html {
 }
 
 .main {
+  height: 100%;
+  margin-left: 300px;
+  overflow-y: scroll;
+  background: #BBE1FA;
+  border-top-left-radius: 5px;
+}
+/*----------------------------------------
+Scrollbars
+----------------------------------------*/
+::-webkit-scrollbar {
+    width: 10px;
+}
 
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: none;
+}
+
+.main.hasScrollBar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.main.hasScrollBar::-webkit-scrollbar-track {
+    background: none;
+}
+
+.main.hasScrollBar::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 10px 10px #1B262C;
+    border: solid 3px transparent;
+    border-radius: 20px;
+    transition: box-shadow 0.25;
+}
+
+.sideBar.hasScrollBar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.sideBar.hasScrollBar::-webkit-scrollbar-track {
+    background: none;
+}
+
+.sideBar.hasScrollBar::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 10px 10px #ddd;
+    border: solid 3px transparent;
+    border-radius: 20px;
+    transition: box-shadow 0.25;
 }
