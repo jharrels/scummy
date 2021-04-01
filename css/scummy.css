@@ -61,14 +61,14 @@ html {
 .rightMenuBar {
   position: absolute;
   display: inline-block;
-  right: 30px;
+  right: 15px;
   padding: 10px 20px;
 }
 
 .leftMenuBar {
   position: absolute;
   display: inline-block;
-  left: 330px;
+  left: 305px;
   padding: 10px 20px;
 }
 
@@ -78,10 +78,15 @@ html {
   display: inline-block;
   padding: 5px 15px;
   text-align: center;
-  color: #1B262C;
-  background-color: rgba(27, 39, 45, 0.5);
+  background-color: rgba(27, 39, 45, 0.7);
+  color: rgba(255,255,255,0.7);
   margin: auto 5px;
   transition: background-color 0.25s, color 0.25s;
+}
+
+.menuButton.active {
+  background-color: rgba(255,255,255,0.7);
+  color: rgba(27, 39, 45, 0.7);
 }
 
 .menuButton:hover {
@@ -89,13 +94,68 @@ html {
   background-color: #1B262C;
 }
 
+.no-left-radius {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.no-right-radius {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.no-left-margin {
+  margin-left: 0;
+}
+
+.no-right-margin {
+  margin-right: 0;
+}
+
 .main {
-  height: 100%;
+  height: calc(100vh - 30px);
   margin-left: 300px;
   overflow-y: scroll;
   background: #BBE1FA;
   border-top-left-radius: 5px;
+  padding: 60px 30px 30px 30px;
 }
+
+
+
+
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 10px;
+}
+
+#grid>div img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+#grid>div span {
+  font-family: sans-serif;
+  color: #1B262C;
+  font-size: .8em;
+  width: 100%;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+
+
+
+
+
 /*----------------------------------------
 Scrollbars
 ----------------------------------------*/

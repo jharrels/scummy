@@ -21,6 +21,7 @@ let titlebar = new customTitlebar.Titlebar({
 });
 
 drawCategories();
+drawGames();
 
 $(".sideBar").on("mouseenter", () => {
   $(".sideBar").addClass("hasScrollBar");
@@ -40,4 +41,10 @@ function drawCategories() {
     let tmpObject = $("<div></div>", {"class":"sideBarItem", "id":key}).text(categories[key]).prepend(tmpIcon);
     $("#sideBarCategories").append(tmpObject);
   });
+}
+
+function drawGames() {
+  if ($("#gallery-view").hasClass("active")) {
+    
+  }
 }

@@ -1,0 +1,23 @@
+var categories = {
+  "access": "Access Software",
+  "adventuresoft": "Adventure/Horror Soft",
+  "composer": "Magic Tales",
+  "delphine": "Delphine Software",
+  "if": "Interactive Fiction",
+  "living": "Living Books",
+  "humongous": "Humongous Entertainment",
+  "coktel": "Coktel Vision",
+  "revolution": "Revolution Studios",
+  "westwood": "Westwood Studios",
+  "tsunami": "Tsunami Games",
+  "fan": "Fan Games",
+  "sierra": "Sierra",
+  "animagic": "Animation Magic",
+  "lucasarts": "LucasArts",
+  "gda": "Gray Design Associates",
+  "nwc": "New World Computing",
+  "cyan": "Cyan Worlds",
+  "polarware": "Polarware",
+  "origin": "Origin Systems",
+  "activision": "Activision"
+};
