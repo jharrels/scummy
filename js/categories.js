@@ -19,5 +19,6 @@ var categories = {
   "cyan": "Cyan Worlds",
   "polarware": "Polarware",
   "origin": "Origin Systems",
-  "activision": "Activision"
+  "activision": "Activision",
+  "other": "Other Games"
 };

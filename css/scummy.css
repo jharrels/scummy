@@ -45,6 +45,22 @@ html {
   opacity: 1.0;
 }
 
+.sideBarItem.select > i.bookmark {
+  color: #080;
+}
+
+.sideBarItem.select > i.favorite {
+  color: #800;
+}
+
+.sideBarItem.select > i.bookmark {
+  color: #080;
+}
+
+.sideBarItem:hover > i {
+  opacity: 1.0;
+}
+
 .sideBarItem:hover > i {
   opacity: 1.0;
 }
@@ -52,6 +68,16 @@ html {
 .sideBarItem i {
   opacity: 0.5;
   padding-right: 5px;
+}
+
+.sideBarItem > .badge {
+  display: inline-block;
+  margin-left: 5px;
+  background: white;
+  color: #1B262C;
+  padding: 0 10px;
+  border-radius: 20px;
+  font-size: 0.8em;
 }
 
 #sideBarCategories {
@@ -119,10 +145,8 @@ html {
   background: #BBE1FA;
   border-top-left-radius: 5px;
   padding: 60px 30px 30px 30px;
+  box-sizing: border-box;
 }
-
-
-
 
 
 #grid {
