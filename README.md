@@ -169,4 +169,4 @@ Project Link: [https://github.com/jharrels/scummy](https://github.com/jharrels/s
 [license-url]: https://github.com/jharrels/scummy/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/justin-harrelson-a7b18549
-[product-screenshot]: https://j-topia.com/images/scummy_gallery.png
+[scummy-gallery]: https://j-topia.com/images/scummy_gallery.png
