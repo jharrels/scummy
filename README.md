@@ -11,7 +11,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/jharrels/scummy">
-    <img src="images/logo.png" alt="Logo" width="100" height="100">
+    <img src="https://j-topia.com/images/scummy_logo.png" alt="Logo" width="100" height="100">
   </a>
 
   <h3 align="center">Scummy</h3>
