@@ -148,7 +148,6 @@ html {
   box-sizing: border-box;
 }
 
-
 #grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -175,7 +174,18 @@ html {
   text-align: center;
 }
 
+#list>div img {
+  height: 40px;
+  border-radius: 5px;
+}
 
+#list>div span {
+  line-height: 40px;
+  font-size: 1.2em;
+  font-family: sans-serif;
+  color: #1B262C;
+  font-weight: 600;
+}
 
 
 
