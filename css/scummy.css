@@ -159,6 +159,8 @@ html {
   height: auto;
   border-radius: 5px;
   margin-bottom: 5px;
+  box-shadow: none;
+  transition: all .25s;
 }
 
 #grid>div span {
@@ -174,17 +176,39 @@ html {
   text-align: center;
 }
 
+#grid>div img:hover {
+  filter: brightness(1.2) contrast(1.0);
+  transition: all .25s;
+  transform: scale(1.03, 1.03);
+}
+
+#list>div {
+  border-radius: 5px;
+  background: rgba(0,0,0,0.1);
+  margin-bottom: 5px;
+  padding: 3px;
+}
+
 #list>div img {
-  height: 40px;
+  width: 30px;
+  height: auto;
   border-radius: 5px;
 }
 
 #list>div span {
-  line-height: 40px;
-  font-size: 1.2em;
+  margin-left: 10px;
+  display: inline-block;
+  font-size: 1em;
   font-family: sans-serif;
   color: #1B262C;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 50%;
+  position: relative;
+  top: -8px; /* what the hell is wrong with this DIV!? This should NOT be needed.*/
+  left: 0;
 }
 
 
@@ -233,4 +257,18 @@ Scrollbars
     border: solid 3px transparent;
     border-radius: 20px;
     transition: box-shadow 0.25;
+}
+
+/*----------------------------------------
+Game Details
+----------------------------------------*/
+#game-info {
+  position: absolute;
+  height: calc(100vh - 30px);
+  width: calc(100vw - 300px);
+  overflow-y: scroll;
+  background: #BBE1FA;
+  border-top-left-radius: 5px;
+  padding: 60px 30px 30px 30px;
+  box-sizing: border-box;
 }

@@ -61,9 +61,7 @@
 
 [![Scummy][scummy-gallery]](https://j-topia.com/images/scummy_gallery.png)
 
-Scummy is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. While it is a fantastic application that has given many a chance to relive their childhood favorites, I find the user interface a little old school.
-
-Why didn't I just contribute to the SCUMMVM project? Because I am a horrible C/C++ developer and quite honestly, I wasn't sure what I was looking at when I snagged the source code. I am used to working with web technologies, so I thought about providing a front-end for those who would like to use one as a way of giving back to the SCUMMVM community.
+Scummy is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss.
 
 A list of resources that I find helpful are listed in the acknowledgements.
 
@@ -144,13 +142,12 @@ Project Link: [https://github.com/jharrels/scummy](https://github.com/jharrels/s
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 * [The SCUMMVM Team](https://scummvm.org)
-* [Choose an Open Source License](https://choosealicense.com)
+* [Moby Games](https://www.mobygames.com)
 * [Font Awesome](https://fontawesome.com)
-* [GitHub Pages](https://pages.github.com)
 * [Node.js](https://nodejs.org)
 * [JQuery](https://jquery.com)
 * [Electron](https://www.electronjs.org)
-
+* [Choose an Open Source License](https://choosealicense.com)
 
 
 
@@ -166,7 +163,7 @@ Project Link: [https://github.com/jharrels/scummy](https://github.com/jharrels/s
 [issues-shield]: https://img.shields.io/github/issues/jharrels/scummy.svg?style=for-the-badge
 [issues-url]: https://github.com/jharrels/scummy/issues
 [license-shield]: https://img.shields.io/github/license/jharrels/scummy.svg?style=for-the-badge
-[license-url]: https://github.com/jharrels/scummy/blob/master/LICENSE.txt
+[license-url]: https://github.com/jharrels/scummy/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/justin-harrelson-a7b18549
 [scummy-gallery]: https://j-topia.com/images/scummy_gallery.png
