@@ -78,6 +78,11 @@ function drawGames() {
     $(".main").html("").append(grid);
     for (i=0; i<shortNames.length; i++) {
       let imagePath = `images/${gameData[shortNames[i]]['category']}/${shortNames[i]}.png`;
+      try {
+        fs.accessSync(imagePath, fs.constants.R_OK);
+      } catch(err) {
+         imagePath = "images/missing.png";
+      }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let gameNameObj = $("<span></span>").text(installed[shortNames[i]]['name']);
       let rowObj = $("<div></div>", {"class": "game", "id": shortNames[i]}).append(gameImageObj).append(gameNameObj);
@@ -111,7 +116,12 @@ function getInstalledGames() {
         let testId = rawGameIdList.slice(0,numPieces).join("-");
         if (testId in gameData) {
           found = true;
-          installed[testId] = {"name": parsedGameName[1], "version": parsedGameName[2], "versionShortName": rawGameId};
+          if (testId in installed) {
+            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
+          } else {
+            installed[testId] = {"name": parsedGameName[1], "versions": []};
+            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
+          }
         } else {
           numPieces--;
         }
@@ -119,6 +129,7 @@ function getInstalledGames() {
     }
     drawCategories();
     drawGames();
+    console.log(installed);
   });
 }
 
