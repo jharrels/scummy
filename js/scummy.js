@@ -44,12 +44,41 @@ $(".main").on("mouseenter", () => {
 });
 
 $(".main").on("dblclick", ".game", function(e) {
-  alert($(this).attr("id"));
+  let gameId = $(this).attr("id");
+  launchGame(gameId);
 });
 
 /* ----------------------------------------------------------------------------
    FUNCTIONS
 ---------------------------------------------------------------------------- */
+function getGameShortName(gameId) {
+  let gameShortName = "";
+  for (i=0; i<installed[gameId]['versions'].length; i++) {
+    gameShortName = installed[gameId]['versions'][i]['versionShortName'];
+  }
+  return gameShortName;
+}
+
+function launchGame(gameId) {
+  let launchOptions = [];
+  let shortName = getGameShortName(gameId);
+  let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
+  launchOptions.push(`--path="${installPath}"`);
+  launchOptions.push(gameId);
+  let rawData = "";
+  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  showWaiting(installed[gameId]['name']);
+  scummvm.stdout.on('data', (data) => {
+  });
+
+  scummvm.stderr.on('data', (data) => {
+  });
+
+  scummvm.on('exit', (code) => {
+    hideWaiting();
+  });
+}
+
 function drawCategories() {
   $("#all").html(installed.length);
   $("#favorites").html(favorites.length);
@@ -119,7 +148,7 @@ function getInstalledGames() {
           if (testId in installed) {
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
           } else {
-            installed[testId] = {"name": parsedGameName[1], "versions": []};
+            installed[testId] = {"name": parsedGameName[1].trim(), "versions": []};
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
           }
         } else {
@@ -129,7 +158,6 @@ function getInstalledGames() {
     }
     drawCategories();
     drawGames();
-    console.log(installed);
   });
 }
 
@@ -141,4 +169,19 @@ function getScummvmConfigPath() {
 function loadScummvmConfig() {
   let rawScummvmConfig = fs.readFileSync(scummvmConfigPath, 'utf-8');
   scummvmConfig = ini.parse(rawScummvmConfig);
+}
+
+function showWaiting(gameName) {
+  let textObj = $("<span></span>").html(`Playing <b>${gameName}</b>.`);
+  let iconObj = $("<i></i>", {"class": "fas fa-circle-notch fa-spin"});
+  let innerObj = $("<div></div>", {"class": "inner"}).html(iconObj).append(textObj);
+  let wrapperObj = $("<div></div>", {"class": "waiting"}).append(innerObj);
+  $(document.body).prepend(wrapperObj);
+  $(".waiting").fadeIn(500);
+}
+
+function hideWaiting() {
+  $(".waiting").fadeOut(500, () => {
+    $(".waiting").remove();
+  });
 }
