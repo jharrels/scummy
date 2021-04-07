@@ -80,7 +80,7 @@ function launchGame(gameId) {
 }
 
 function drawCategories() {
-  $("#all").html(installed.length);
+  $("#all").html(Object.keys(installed).length);
   $("#favorites").html(favorites.length);
   let installedCategories = {};
   Object.keys(categories).forEach(key => {
