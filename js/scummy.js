@@ -137,7 +137,12 @@ function getInstalledGames() {
     for (i=2; i<rawDataList.length-1; i++) {
       let parsedData = rawDataList[i].match(/(.+?)[ ]{2,}(.+)$/);
       let rawGameId = parsedData[1];
-      let parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+      let parsedGameName;
+      if (parsedData[2].includes("(")) {
+        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+      } else {
+        parsedGameName = ["", parsedData[2], "Default"];
+      }
       let rawGameIdList = rawGameId.split("-");
       let numPieces = rawGameIdList.length
       let found = false;
