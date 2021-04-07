@@ -298,6 +298,48 @@ Scrollbars
   text-shadow: 0px 0px 8px rgba(27, 39, 45, 1), 0px 0px 8px rgba(27, 39, 45, 1);
 }
 
+#context-menu {
+  display: inline-block;
+  position: absolute;
+  background-color: rgba(27, 39, 45);
+  box-shadow: 0px 3px 8px 3px rgba(0,0,0,0.7);
+  top: 0;
+  left: 0;
+  z-index: 5;
+  color: white;
+  display: none;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+#context-menu > .menu-item {
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 1.2em;
+  font-family: sans-serif;
+}
+
+#context-menu > .play {
+  color: #0c0;
+  transition: all .25s;
+  margin-bottom: 5px;
+}
+
+#context-menu > .manage {
+  color: #ccc;
+  transition: all .25s;
+}
+
+#context-menu > .play:hover {
+  background-color: #0c0;
+  color: rgba(27, 39, 45);
+}
+
+#context-menu > .manage:hover {
+  background-color: #ccc;
+  color: rgba(27, 39, 45);
+}
+
 /*----------------------------------------
 Game Details
 ----------------------------------------*/

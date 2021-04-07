@@ -18,6 +18,7 @@ var scummvmConfigPath = "";
 var scummvmConfig = {};
 var installed = {};
 var favorites = [];
+var selectedGame = "";
 
 //Menu.setApplicationMenu(null);
 
@@ -43,9 +44,18 @@ $(".main").on("mouseenter", () => {
   $(".main").removeClass("hasScrollBar");
 });
 
-$(".main").on("dblclick", ".game", function(e) {
+$(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   launchGame(gameId);
+});
+
+$(".main").on("contextmenu", ".game", function(e) {
+  let gameId = $(this).attr("id");
+  $("#context-menu").css({left: e.pageX-20, top: e.pageY-50}).fadeIn(250);
+});
+
+$("#context-menu").on("mouseleave", () => {
+  $("#context-menu").fadeOut(250);
 });
 
 /* ----------------------------------------------------------------------------
