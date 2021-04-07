@@ -51,11 +51,26 @@ $(".main").on("click", ".game", function(e) {
 
 $(".main").on("contextmenu", ".game", function(e) {
   let gameId = $(this).attr("id");
-  $("#context-menu").css({left: e.pageX-20, top: e.pageY-50}).fadeIn(250);
+  selectedGame = gameId;
+  $(this).children("img").addClass("active");
+  $("#context-menu").children(".launch-items").html("");
+  for (i=0; i<installed[gameId]['versions'].length; i++) {
+    if (installed[gameId]['versions'][i]['version'] == "Default") {
+      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+      let menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append(" Play");
+      $("#context-menu").children(".launch-items").append(menuItemObj);
+    } else {
+      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+      let menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append(installed[gameId]['versions'][i]['version']);
+      $("#context-menu").children(".launch-items").append(menuItemObj);
+    }
+  }
+  $("#context-menu").css({left: e.pageX-50, top: e.pageY-50}).fadeIn(250);
 });
 
 $("#context-menu").on("mouseleave", () => {
   $("#context-menu").fadeOut(250);
+  $(`#${selectedGame}`).children("img").removeClass("active");
 });
 
 /* ----------------------------------------------------------------------------
