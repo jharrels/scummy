@@ -52,6 +52,7 @@ $(".main").on("dblclick", ".game", function(e) {
    FUNCTIONS
 ---------------------------------------------------------------------------- */
 function getGameShortName(gameId) {
+  console.log(gameId);
   let gameShortName = "";
   for (i=0; i<installed[gameId]['versions'].length; i++) {
     gameShortName = installed[gameId]['versions'][i]['versionShortName'];
@@ -100,23 +101,26 @@ function drawCategories() {
 }
 
 function drawGames() {
-  let shortNames = Object.keys(installed);
-  shortNames.sort(function(a, b) { return installed[a]['name'].toLowerCase() - installed[b]['name'].toLowerCase() });
+  let longNames = {};
+  Object.keys(installed).forEach(key => {
+    longNames[installed[key]['name']] = key;
+  });
   if ($("#gallery-view").hasClass("active")) {
     let grid = $("<div></div>", {"id": "grid"});
     $(".main").html("").append(grid);
-    for (i=0; i<shortNames.length; i++) {
-      let imagePath = `images/${gameData[shortNames[i]]['category']}/${shortNames[i]}.png`;
+    Object.keys(longNames).sort().forEach(key => {
+      let category = gameData[longNames[key]]['category'];
+      let imagePath = `images/${category}/${longNames[key]}.png`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
          imagePath = "images/missing.png";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
-      let gameNameObj = $("<span></span>").text(installed[shortNames[i]]['name']);
-      let rowObj = $("<div></div>", {"class": "game", "id": shortNames[i]}).append(gameImageObj).append(gameNameObj);
+      let gameNameObj = $("<span></span>").text(key);
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key]}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
-    }
+    });
   }
 }
 
