@@ -19,6 +19,7 @@ var scummvmConfig = {};
 var installed = {};
 var favorites = [];
 var selectedGame = "";
+var defaultVersions = {};
 
 //Menu.setApplicationMenu(null);
 
@@ -61,7 +62,12 @@ $(".main").on("contextmenu", ".game", function(e) {
       $("#context-menu").children(".launch-items").append(menuItemObj);
     } else {
       let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
-      let menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append(installed[gameId]['versions'][i]['version']);
+      let menuItemObj;
+      if (installed[gameId]['versions'][i]['versionShortName'] == defaultVersions[gameId]) {
+        menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append("Play "+installed[gameId]['versions'][i]['version']+" <i class='fas fa-star'></i>");
+      } else {
+        menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append("Play "+installed[gameId]['versions'][i]['version']);
+      }
       $("#context-menu").children(".launch-items").append(menuItemObj);
     }
   }
@@ -89,7 +95,8 @@ function launchGame(gameId) {
   let launchOptions = [];
   let shortName = getGameShortName(gameId);
   let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
-  launchOptions.push(`--path="${installPath}"`);
+  let tempConfigPath = writeTempConfig(shortName);
+  launchOptions.push(`--config="${tempConfigPath}"`);
   launchOptions.push(gameId);
   let rawData = "";
   let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
@@ -184,6 +191,7 @@ function getInstalledGames() {
           } else {
             installed[testId] = {"name": parsedGameName[1].trim(), "versions": []};
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
+            defaultVersions[testId] = rawGameId;
           }
         } else {
           numPieces--;
@@ -218,4 +226,21 @@ function hideWaiting() {
   $(".waiting").fadeOut(500, () => {
     $(".waiting").remove();
   });
+}
+
+function writeTempConfig(shortName) {
+    let tempConfig = [];
+
+    let lineEnd;
+    if (os.type() == 'Windows_NT') tempConfigPath = process.env.APPDATA+"\\Scummy\\temp.ini";
+    if (os.type() == 'Darwin') tempConfigPath = process.env.HOME+"/Library/Preferences/Scummy";
+    tempConfig.push("[scummvm]");
+    Object.keys(scummvmConfig['scummvm']).forEach(key => {
+      tempConfig.push(`${key}=${scummvmConfig['scummvm'][key]}`);
+    });
+    Object.keys(scummvmConfig[shortName]).forEach(key => {
+      tempConfig.push(`${key}=${scummvmConfig[shortName][key]}`);
+    });
+    fs.writeFileSync(tempConfigPath, tempConfig.join("\n"), {encoding: "utf8"});
+    return tempConfigPath;
 }
