@@ -106,7 +106,24 @@ This is an example of how to list things you need to use the software and how to
 
 <!-- ROADMAP -->
 ## Roadmap
-Visit the Trello board at https://trello.com/b/kM5O1UM2/scummy to see where we're headed.
+Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few extras:
+* ~~Obtain a list of installed games.~~ :shipit:
+* Display the list of installed games.
+* Allow configuration of installed games.
+* Allow configuration of SCUMMVM default settings.
+* Allow launching of games, including different versions of games.
+* Remove installed games.
+* Allow favoriting of games.
+* Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).
+
+Planned features:
+* Organize games into player-made collections (for example: RPGs, Monkey Island, King's Quest, etc).
+* Launch other applications before launching the game. Useful for setting up other devices, such as virtual drives or MT-32 emulation.
+* Search function.
+* Additional game information.
+* GUI configuration options for Scummy.
+* Recording total time played for games.
+* Themes.
 
 See the [open issues](https://github.com/jharrels/scummy/issues) for a list of proposed features (and known issues).
 
