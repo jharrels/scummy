@@ -108,7 +108,7 @@ This is an example of how to list things you need to use the software and how to
 ## Roadmap
 Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few extras:
 * ~~Obtain a list of installed games.~~ :heavy_check_mark:
-* Display the list of installed games.
+* Display the list of installed games using either a grid view or a list view.
 * Allow configuration of installed games.
 * Allow configuration of SCUMMVM default settings.
 * Allow launching of games, including different versions of games.
