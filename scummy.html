@@ -25,7 +25,7 @@
     </div>
   </div>
   <div class="leftMenuBar">
-    <div class="menuButton">
+    <div class="menuButton" id="add-game">
       <i class="fas fa-plus fa-fw"></i>
     </div>
     <div class="menuButton">
@@ -67,6 +67,19 @@
     <div class="divider"></div>
     <div class="manage menu-item">
       <i class="fas fa-sliders-h fa-fw"></i> Manage Game
+    </div>
+  </div>
+  <div class="modal" id="add-modal">
+    <div class="modal-wrapper">
+      <div class="modal-title"></div>
+      <div class="modal-body">
+        <div class="modal-boxart"></div>
+        <div class="modal-message"></div>
+      </div>
+      <div class="modal-footer clear">
+        <div id="add-modal-no" class="modal-button dark">No</div><div id="add-modal-yes" class="modal-button bright">Yes</div>
+        <div class="clear"></div>
+      </div>
     </div>
   </div>
   <script>let $ = require('jquery');</script>

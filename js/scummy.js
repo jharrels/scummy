@@ -20,6 +20,7 @@ var installed = {};
 var favorites = [];
 var selectedGame = "";
 var defaultVersions = {};
+var importGamePath = "";
 
 //Menu.setApplicationMenu(null);
 
@@ -32,6 +33,19 @@ let titlebar = new customTitlebar.Titlebar({
 getScummvmConfigPath();
 loadScummvmConfig();
 getInstalledGames();
+
+$("#add-game").on("click", () => {
+  let addPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+      "title": "Add Game",
+      "message": "Choose the directory containing the game to add.",
+      "properties": [
+        'openDirectory'
+      ]
+  })
+  if (addPath) {
+    detectGame(addPath[0]);
+  }
+});
 
 $(".sideBar").on("mouseenter", () => {
   $(".sideBar").addClass("hasScrollBar");
@@ -77,6 +91,10 @@ $(".main").on("contextmenu", ".game", function(e) {
 $("#context-menu").on("mouseleave", () => {
   $("#context-menu").fadeOut(250);
   $(`#${selectedGame}`).children("img").removeClass("active");
+});
+
+$("#add-modal-no").on("click", () => {
+  hideModal("#add-modal");
 });
 
 /* ----------------------------------------------------------------------------
@@ -243,4 +261,49 @@ function writeTempConfig(shortName) {
     });
     fs.writeFileSync(tempConfigPath, tempConfig.join("\n"), {encoding: "utf8"});
     return tempConfigPath;
+}
+
+function detectGame(gamePath) {
+  gamePath = gamePath.split("\\").join("\\\\");
+  let launchOptions = ['--detect', `--path="${gamePath}"`];
+  let rawData = "";
+  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  scummvm.stdout.on('data', (data) => {
+    rawData += data.toString();
+  });
+
+  scummvm.stderr.on('data', (data) => {
+  });
+
+  scummvm.on('exit', (code) => {
+    rawDataList = rawData.split("\r\n");
+    let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
+    let shortName = parsedData[1].trim();
+    let category = gameData[shortName]['category'];
+    let imagePath = `images/${category}/${shortName}.png`;
+    try {
+      fs.accessSync(imagePath, fs.constants.R_OK);
+    } catch(err) {
+       imagePath = "images/missing.png";
+    }
+    if (parsedData[2].includes("(")) {
+      parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+    } else {
+      parsedGameName = ["", parsedData[2], "Default"];
+    }
+    $("#add-modal").children(".modal-wrapper").children(".modal-title").html("New Game Detected");
+    let imageObj = $("<img></img", {"src": imagePath});
+    $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
+    let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]);
+    $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("<br>Would you like to import it?");
+    showModal("#add-modal");
+  })
+}
+
+function showModal(modalId) {
+  $(modalId).fadeIn(250);
+}
+
+function hideModal(modalId) {
+  $(modalId).fadeOut(250);
 }
