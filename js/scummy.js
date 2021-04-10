@@ -195,11 +195,11 @@ function drawGames() {
     $(".main").html("").append(grid);
     Object.keys(longNames).sort().forEach(key => {
       let category = gameData[longNames[key]]['category'];
-      let imagePath = `images/${category}/${longNames[key]}.png`;
+      let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
-         imagePath = "images/missing.png";
+         imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let gameNameObj = $("<span></span>").text(key);
@@ -212,11 +212,11 @@ function drawGames() {
     $(".main").html("").append(list);
     Object.keys(longNames).sort().forEach(key => {
       let category = gameData[longNames[key]]['category'];
-      let imagePath = `images/${category}/${longNames[key]}.png`;
+      let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
-         imagePath = "images/missing.png";
+         imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let gameNameObj = $("<span></span>").text(key);
@@ -332,11 +332,11 @@ function detectGame(gamePath) {
     let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
     let shortName = parsedData[1].trim();
     let category = gameData[shortName]['category'];
-    let imagePath = `images/${category}/${shortName}.png`;
+    let imagePath = `boxart/${category}/${shortName}.jpg`;
     try {
       fs.accessSync(imagePath, fs.constants.R_OK);
     } catch(err) {
-       imagePath = "images/missing.png";
+       imagePath = "boxart/missing.jpg";
     }
     if (parsedData[2].includes("(")) {
       parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
