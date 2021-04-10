@@ -72,7 +72,11 @@ A list of resources that I find helpful are listed in the acknowledgements.
 * [Electron](https://www.electronjs.org)
 * [Font Awesome](https://fontawesome.com)
 
-
+### We need help!
+Currently Scummy is being developed on a machine running Windows, but we purposely chose a cross-platform framework in which to develop it. We need help in the following areas:
+* Mac-specific code and/or the ability to test on a Mac.
+* Linux-specific code and/or the ability to test on Linux.
+* Translations into other languages.
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -107,14 +111,16 @@ This is an example of how to list things you need to use the software and how to
 <!-- ROADMAP -->
 ## Roadmap
 Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few extras:
-* ~~Obtain a list of installed games.~~ :heavy_check_mark:
-* Display the list of installed games using either a grid view or a list view.
-* Allow configuration of installed games.
-* Allow configuration of SCUMMVM default settings.
-* Allow launching of games, including different versions of games.
-* Remove installed games.
-* Allow favoriting of games.
-* Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).
+* **0.1.0** - ~~Obtain a list of installed games.~~ :heavy_check_mark:
+* **0.2.0** - ~~Display the list of installed games using either a grid view or a list view.~~ :heavy_check_mark:
+* 0.3.0 - Install games via Scummy, including detecting an uninstalled game or a new version of an installed game.
+* 0.4.0 - Ability to configure installed games.
+* 0.5.0 - Allow configuration of SCUMMVM default settings.
+* 0.6.0 - Launch games, including different versions of games.
+* 0.7.0 - Remove installed games.
+* 0.8.0 - Favoriting of games.
+* 0.9.0 - Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).
+* 1.0.0 - After shakedown of bugs and some polish.
 
 Planned features:
 * Organize games into player-made collections (for example: RPGs, Monkey Island, King's Quest, etc).

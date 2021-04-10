@@ -30,10 +30,20 @@ let titlebar = new customTitlebar.Titlebar({
   overflow: "hidden"
 });
 
+/* ----------------------------------------------------------------------------
+   LOAD PREFS AND SETUP THE GUI AT LAUNCH
+---------------------------------------------------------------------------- */
+var listMode = store.get('listMode');
+if (listMode === undefined) listMode = "gallery";
+$(`#${listMode}-view`).addClass("active");
+
 getScummvmConfigPath();
 loadScummvmConfig();
 getInstalledGames();
 
+/* ----------------------------------------------------------------------------
+   HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
+---------------------------------------------------------------------------- */
 $("#add-game").on("click", () => {
   let addPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
       "title": "Add Game",
@@ -46,6 +56,27 @@ $("#add-game").on("click", () => {
     detectGame(addPath[0]);
   }
 });
+
+$("#gallery-view").on("click", () => {
+  if (!$("gallery-view").hasClass("active")) {
+    $("#list-view").removeClass("active");
+    $("#gallery-view").addClass("active");
+    listMode = "gallery";
+    store.set('listMode', listMode);
+    drawGames();
+  }
+});
+
+$("#list-view").on("click", () => {
+  if (!$("list-view").hasClass("active")) {
+    $("#gallery-view").removeClass("active");
+    $("#list-view").addClass("active");
+    listMode = "list";
+    store.set('listMode', listMode);
+    drawGames();
+  }
+});
+
 
 $(".sideBar").on("mouseenter", () => {
   $(".sideBar").addClass("hasScrollBar");
@@ -67,7 +98,8 @@ $(".main").on("click", ".game", function(e) {
 $(".main").on("contextmenu", ".game", function(e) {
   let gameId = $(this).attr("id");
   selectedGame = gameId;
-  $(this).children("img").addClass("active");
+  if (listMode == "gallery") $(this).children("img").addClass("active");
+  if (listMode == "list") $(this).addClass("active");
   $("#context-menu").children(".launch-items").html("");
   for (i=0; i<installed[gameId]['versions'].length; i++) {
     if (installed[gameId]['versions'][i]['version'] == "Default") {
@@ -90,7 +122,8 @@ $(".main").on("contextmenu", ".game", function(e) {
 
 $("#context-menu").on("mouseleave", () => {
   $("#context-menu").fadeOut(250);
-  $(`#${selectedGame}`).children("img").removeClass("active");
+  if (listMode == "gallery") $(`#${selectedGame}`).children("img").removeClass("active");
+  if (listMode == "list") $(`#${selectedGame}`).removeClass("active");
 });
 
 $("#add-modal-no").on("click", () => {
@@ -151,11 +184,13 @@ function drawCategories() {
 }
 
 function drawGames() {
+  $("#grid").remove();
+  $("#list").remove();
   let longNames = {};
   Object.keys(installed).forEach(key => {
     longNames[installed[key]['name']] = key;
   });
-  if ($("#gallery-view").hasClass("active")) {
+  if (listMode == "gallery") {
     let grid = $("<div></div>", {"id": "grid"});
     $(".main").html("").append(grid);
     Object.keys(longNames).sort().forEach(key => {
@@ -170,6 +205,23 @@ function drawGames() {
       let gameNameObj = $("<span></span>").text(key);
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key]}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
+    });
+  }
+  if (listMode == "list") {
+    let list = $("<div></div>", {"id": "list"});
+    $(".main").html("").append(list);
+    Object.keys(longNames).sort().forEach(key => {
+      let category = gameData[longNames[key]]['category'];
+      let imagePath = `images/${category}/${longNames[key]}.png`;
+      try {
+        fs.accessSync(imagePath, fs.constants.R_OK);
+      } catch(err) {
+         imagePath = "images/missing.png";
+      }
+      let gameImageObj = $("<img></img", {"src": imagePath});
+      let gameNameObj = $("<span></span>").text(key);
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key]}).append(gameImageObj).append(gameNameObj);
+      $("#list").append(rowObj);
     });
   }
 }

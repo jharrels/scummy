@@ -120,6 +120,12 @@ html {
   background-color: #1B262C;
 }
 
+.menuButton:active {
+  color: #1B262C;
+  background-color: #fff;
+  transition: none;
+}
+
 .no-left-radius {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
@@ -193,12 +199,14 @@ html {
   background: rgba(0,0,0,0.1);
   margin-bottom: 5px;
   padding: 3px;
+  transition: all .25s;
 }
 
 #list>div img {
   width: 30px;
   height: auto;
   border-radius: 5px;
+  transition: all .25s;
 }
 
 #list>div span {
@@ -215,6 +223,35 @@ html {
   position: relative;
   top: -8px; /* what the hell is wrong with this DIV!? This should NOT be needed.*/
   left: 0;
+}
+
+#list>div.game:hover {
+  filter: brightness(1.2) contrast(1.0);
+  transition: all .25s;
+  transform: scale(1.01, 1.01);
+  background: rgba(0,0,0,0.2);
+}
+
+#list>div.game:hover > img {
+  transition: all .25s;
+  transform: scale(1.15, 1.15);
+}
+#list>div.game.active {
+  filter: brightness(1.2) contrast(1.0);
+  transition: all .25s;
+  transform: scale(1.01, 1.01);
+  background: rgba(0,0,0,0.2);
+}
+
+#list>div.game.active > img {
+  transition: all .25s;
+  transform: scale(1.15, 1.15);
+}
+
+#grid>div img.active {
+  filter: brightness(1.2) contrast(1.0);
+  transition: all .25s;
+  transform: scale(1.03, 1.03);
 }
 
 /*----------------------------------------
