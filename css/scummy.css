@@ -434,6 +434,7 @@ Dialog
 }
 
 .modal > .modal-wrapper > .modal-title {
+  background-color: black;
   font-size: 1.1em;
   text-align: center;
   color: #BBE1FA;
@@ -444,8 +445,10 @@ Dialog
 
 .modal > .modal-wrapper > .modal-body > .modal-boxart {
   display: inline-block;
-  margin: 0 30px;
-  float: left;
+  position: relative;
+  left: 50%;
+  margin-top: 30px;
+  transform: translateX(-50%);
 }
 
 .modal > .modal-wrapper > .modal-body > .modal-boxart > img {
@@ -458,10 +461,15 @@ Dialog
   font-size: 1.3em;
   color: white;
   font-family: sans-serif;
-  padding-right: 30px;
+  padding: 30px 30px;
+  text-align: center;
 }
 
 .modal > .modal-wrapper > .modal-footer {
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 20px 30px;
 }
 
@@ -515,5 +523,18 @@ Dialog
 .game-name {
   font-size: 2em;
   display: inline-block;
-  margin-bottom: 20px;
+  margin: 10px 0 40px 0;
+  width:100%;
+}
+
+.game-name > small {
+  font-size: .5em;
+  color: #ccc;
+  display: inline-block;
+  margin: 10px 0 40px 0;
+  width:100%;
+}
+
+.warning-color {
+  color: #ffa100;
 }
