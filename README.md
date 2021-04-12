@@ -120,14 +120,13 @@ Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few ex
 * 0.7.0 - Remove installed games.
 * 0.8.0 - Favoriting of games.
 * 0.9.0 - Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).
-* 1.0.0 - After shakedown of bugs and some polish.
+* 1.0.0 - GUI configuration options for Scummy and release.
 
 Planned features:
 * Organize games into player-made collections (for example: RPGs, Monkey Island, King's Quest, etc).
 * Launch other applications before launching the game. Useful for setting up other devices, such as virtual drives or MT-32 emulation.
 * Search function.
 * Additional game information.
-* GUI configuration options for Scummy.
 * Recording total time played for games.
 * Themes.
 

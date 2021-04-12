@@ -16,10 +16,10 @@ const customTitlebar = require('custom-electron-titlebar');
 var devMode = true;
 var scummvmConfigPath = "";
 var scummvmConfig = {};
-var installed = {};
+var installed;
 var favorites = [];
 var selectedGame = "";
-var defaultVersions = {};
+var defaultVersions;
 var importGamePath = "";
 
 //Menu.setApplicationMenu(null);
@@ -130,6 +130,19 @@ $("#add-modal-no").on("click", () => {
   hideModal("#add-modal");
 });
 
+$("#add-modal-yes").on("click", () => {
+  hideModal("#add-modal");
+  importGame(importGamePath);
+});
+
+$("#exists-modal-close").on("click", () => {
+  hideModal("#exists-modal");
+});
+
+$("#unknown-modal-close").on("click", () => {
+  hideModal("#unknown-modal");
+});
+
 /* ----------------------------------------------------------------------------
    FUNCTIONS
 ---------------------------------------------------------------------------- */
@@ -164,6 +177,7 @@ function launchGame(gameId) {
 }
 
 function drawCategories() {
+  $("#sideBarCategories").html("");
   $("#all").html(Object.keys(installed).length);
   $("#favorites").html(favorites.length);
   let installedCategories = {};
@@ -227,6 +241,8 @@ function drawGames() {
 }
 
 function getInstalledGames() {
+  installed = {};
+  defaultVersions = {};
   let rawData = "";
   let scummvm = spawn('scummvm.exe', ['--list-targets'], {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
 
@@ -317,6 +333,7 @@ function writeTempConfig(shortName) {
 
 function detectGame(gamePath) {
   gamePath = gamePath.split("\\").join("\\\\");
+  importGamePath = gamePath;
   let launchOptions = ['--detect', `--path="${gamePath}"`];
   let rawData = "";
   let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
@@ -330,25 +347,75 @@ function detectGame(gamePath) {
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
     let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
-    let shortName = parsedData[1].trim();
-    let category = gameData[shortName]['category'];
-    let imagePath = `boxart/${category}/${shortName}.jpg`;
-    try {
-      fs.accessSync(imagePath, fs.constants.R_OK);
-    } catch(err) {
-       imagePath = "boxart/missing.jpg";
-    }
-    if (parsedData[2].includes("(")) {
-      parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+    if (parsedData) {
+      let shortName = parsedData[1].trim();
+      let category = gameData[shortName]['category'];
+      let imagePath = `boxart/${category}/${shortName}.jpg`;
+      try {
+        fs.accessSync(imagePath, fs.constants.R_OK);
+      } catch(err) {
+         imagePath = "boxart/missing.jpg";
+      }
+      if (parsedData[2].includes("(")) {
+        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+      } else {
+        parsedGameName = ["", parsedData[2], "Default"];
+      }
+      let alreadyInstalled = false;
+      if (shortName in installed) {
+        for (i=0; i<installed[shortName]['versions'].length; i++) {
+          if (installed[shortName]['versions'][i]['version'] == parsedGameName[2]) alreadyInstalled = true;
+        }
+      }
+      console.log(alreadyInstalled);
+      if (alreadyInstalled) {
+        let imageObj = $("<img></img", {"src": imagePath});
+        $("#exists-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
+        let versionObj = $("<small></small>").text(`(${parsedGameName[2]})`);
+        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]).append(versionObj);
+        $("#exists-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("This version of this game has already been imported.");
+        showModal("#exists-modal");
+      }
+      if ((!alreadyInstalled) && (shortName in installed)) {
+        let imageObj = $("<img></img", {"src": imagePath});
+        $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
+        let versionObj = $("<small></small>").text(`(${parsedGameName[2]})`);
+        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]).append(versionObj);
+        $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A game has been detected. Would you like to import it?");
+        showModal("#add-modal");
+      }
+      if ((!alreadyInstalled) && (!(shortName in installed))) {
+        let imageObj = $("<img></img", {"src": imagePath});
+        $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
+        let versionObj = $("<small></small>").text(`(${parsedGameName[2]})`);
+        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]).append(versionObj);
+        $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A game has been detected. Would you like to import it?");
+        showModal("#add-modal");
+      }
     } else {
-      parsedGameName = ["", parsedData[2], "Default"];
+      alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
+      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
+      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("No game was detected.");
+      showModal("#unknown-modal");
     }
-    $("#add-modal").children(".modal-wrapper").children(".modal-title").html("New Game Detected");
-    let imageObj = $("<img></img", {"src": imagePath});
-    $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
-    let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]);
-    $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("<br>Would you like to import it?");
-    showModal("#add-modal");
+  })
+}
+
+function importGame(gamePath) {
+  let launchOptions = ['--add', `--path="${gamePath}"`];
+  let rawData = "";
+  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  scummvm.stdout.on('data', (data) => {
+    rawData += data.toString();
+  });
+
+  scummvm.stderr.on('data', (data) => {
+  });
+
+  scummvm.on('exit', (code) => {
+    loadScummvmConfig();
+    getInstalledGames();
+    drawGames();
   })
 }
 
