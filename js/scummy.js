@@ -16,10 +16,10 @@ const customTitlebar = require('custom-electron-titlebar');
 var devMode = true;
 var scummvmConfigPath = "";
 var scummvmConfig = {};
-var installed = {};
+var installed;
 var favorites = [];
 var selectedGame = "";
-var defaultVersions = {};
+var defaultVersions;
 var importGamePath = "";
 
 //Menu.setApplicationMenu(null);
@@ -177,6 +177,7 @@ function launchGame(gameId) {
 }
 
 function drawCategories() {
+  $("#sideBarCategories").html("");
   $("#all").html(Object.keys(installed).length);
   $("#favorites").html(favorites.length);
   let installedCategories = {};
@@ -240,6 +241,8 @@ function drawGames() {
 }
 
 function getInstalledGames() {
+  installed = {};
+  defaultVersions = {};
   let rawData = "";
   let scummvm = spawn('scummvm.exe', ['--list-targets'], {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
 
