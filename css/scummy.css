@@ -109,6 +109,11 @@ html {
   color: rgba(255,255,255,0.7);
   margin: auto 5px;
   transition: background-color 0.25s, color 0.25s;
+  font-family: sans-serif;
+}
+
+.menuButton.bright {
+  background-color: rgba(47, 59, 65, 0.7);
 }
 
 .menuButton.active {
@@ -143,6 +148,10 @@ html {
 
 .no-right-margin {
   margin-right: 0;
+}
+
+.no-bg {
+  background-color: none;
 }
 
 .main {
@@ -396,13 +405,84 @@ Game Details
 ----------------------------------------*/
 #game-info {
   position: absolute;
+  top: 0;
+  left: 300;
+  display: inline-block;
   height: calc(100vh - 30px);
   width: calc(100vw - 300px);
   overflow-y: scroll;
-  background: #BBE1FA;
+  background: #1b262c;
   border-top-left-radius: 5px;
-  padding: 60px 30px 30px 30px;
+  padding: 30px 30px 30px 30px;
   box-sizing: border-box;
+  z-index: 3;
+  display: none;
+}
+
+.game-info-title {
+  box-sizing: border-box;
+  font-size: 40px;
+  font-family: sans-serif;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.game-info-boxart {
+  float: left;
+  display: inline-block;
+  width: 250px;
+  margin-right: 30px;
+}
+
+.game-info-boxart > img {
+  border-radius: 5px;
+  width: 250px;
+  height: auto;
+}
+
+#game-info-close {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
+.launch-config {
+  width: calc(100% - 280px);
+  float: right;
+  box-sizing: border-box;
+  display: inline-block;
+ }
+
+.game-info-wrapper {
+  margin-bottom: 10px;
+}
+
+.game-info-version {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #BBE1FA;
+}
+
+.game-info-favorite {
+  font-size: 20px;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 5px 15px;
+  text-align: center;
+  background-color: #c00;
+  box-sizing: border-box;
+  color: white;
+  width: 250px;
+  margin: 10px 30px 0 0;
+  font-family: sans-serif;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+hr {
+  opacity: 0.2;
+  border-top: 1px solid white;
+  border-bottom: none;
 }
 
 /*----------------------------------------

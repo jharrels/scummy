@@ -95,6 +95,11 @@ $(".main").on("click", ".game", function(e) {
   launchGame(gameId);
 });
 
+$("#context-menu").on("click", ".manage", function(e) {
+  let gameId = $(this).attr("id");
+  drawGameInfo(gameId);
+});
+
 $(".main").on("contextmenu", ".game", function(e) {
   let gameId = $(this).attr("id");
   selectedGame = gameId;
@@ -117,6 +122,7 @@ $(".main").on("contextmenu", ".game", function(e) {
       $("#context-menu").children(".launch-items").append(menuItemObj);
     }
   }
+  $("#context-menu").children(".manage").attr("id", gameId);
   $("#context-menu").css({left: e.pageX-50, top: e.pageY-50}).fadeIn(250);
 });
 
@@ -141,6 +147,10 @@ $("#exists-modal-close").on("click", () => {
 
 $("#unknown-modal-close").on("click", () => {
   hideModal("#unknown-modal");
+});
+
+$("#game-info-close").on("click", () => {
+  $("#game-info").fadeOut(250);
 });
 
 /* ----------------------------------------------------------------------------
@@ -195,6 +205,54 @@ function drawCategories() {
       $("#sideBarCategories").append(tmpObject);
     }
   });
+}
+
+function drawGameInfo(gameId) {
+  selectedGame = gameId;
+  let category = gameData[gameId]['category'];
+  let imagePath = `boxart/${category}/${gameId}.jpg`;
+  try {
+    fs.accessSync(imagePath, fs.constants.R_OK);
+  } catch(err) {
+     imagePath = "boxart/missing.jpg";
+  }
+  let gameImageObj = $("<img></img", {"src": imagePath});
+  let favoriteTextObj = $("<i></i>", {"class": "far fa-heart"});
+  let favoriteObj = $("<div></div>", {"class": "game-info-favorite"}).html(favoriteTextObj).append(" Favorite");
+  let titleObj = $("<div></div>", {"class": "game-info-title"});
+  $(".launch-config").html(titleObj);
+  $(".game-info-title").html(installed[gameId]['name']);
+  $(".game-info-boxart").html(gameImageObj).append(favoriteObj);
+  for (i=0; i<installed[gameId]['versions'].length; i++) {
+    if (installed[gameId]['versions'][i]['version'] == "Default") {
+      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+      let menuItemObj = $("<div></div>", {"class": "menu-button"}).html(menuIconObj).append(" Play");
+      let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
+      let cfgItemObj = $("<div></div>", {"class": "game-info-configure"}).html(cfgIconObj);
+      let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
+      let defaultItemObj = $("<div></div>", {"class": "game-info-default"}).html(defaultIconObj);
+      let wrapperObj = $("<div></div>").html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
+      $(".launch-config").append(wrapperObj);
+    } else {
+      let versionObj = $("<span></span>", {"class":"game-info-version"}).text(installed[gameId]['versions'][i]['version']);
+      let wrapperObj = $("<div></div>", {"class": "game-info-wrapper"}).html(versionObj);
+      $(".launch-config").append(wrapperObj);
+      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+      let menuItemObj = $("<div></div>", {"class": "menuButton no-left-margin bright"}).html(menuIconObj).append(" Play");
+      let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
+      let cfgItemObj = $("<div></div>", {"class": "menuButton bright"}).html(cfgIconObj).append(" Configure");
+      let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
+      let defaultItemObj = $("<div></div>", {"class": "menuButton bright"}).html(defaultIconObj).append(" Default");;
+      wrapperObj = $("<div></div>", {"class": "game-info-wrapper"}).html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
+      $(".launch-config").append(wrapperObj);
+      if (i < installed[gameId]['versions'].length - 1) {
+        let hrObj = $("<hr>", {"class": "game-info-divider"});
+        $(".launch-config").append(hrObj);
+      }
+    }
+  }
+  $("#context-menu").fadeOut(250);
+  $("#game-info").fadeIn(250);
 }
 
 function drawGames() {
