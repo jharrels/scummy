@@ -62,6 +62,33 @@ engineOptions = {
   agos: [],
   avalanche: [],
   bbvs: [],
+  bladerunner: [
+    {
+      shortDesc: 'Sitcom mode',
+      longDesc: "Game will add laughter after actor's line or narration",
+      flag: 'sitcom'
+    },
+    {
+      shortDesc: 'Shorty mode',
+      longDesc: 'Game will shrink the actors and make their voices high pitched',
+      flag: 'shorty'
+    },
+    {
+      shortDesc: 'Frame limiter high performance mode',
+      longDesc: 'This mode may result in high CPU usage! It avoids use of delayMillis() function.',
+      flag: 'nodelaymillisfl'
+    },
+    {
+      shortDesc: 'Max frames per second limit',
+      longDesc: 'This mode targets a maximum of 120 fps. When disabled, the game targets 60 fps',
+      flag: 'frames_per_secondfl'
+    },
+    {
+      shortDesc: "Disable McCoy's quick stamina drain",
+      longDesc: "When running, McCoy won't start slowing down as soon as the player stops clicking the mouse",
+      flag: 'disable_stamina_drain'
+    }
+  ],
   buried: [],
   cge: [
     {
@@ -418,6 +445,7 @@ engineOptions = {
   sword25: [],
   teenagent: [],
   testbed: [],
+  tinsel: [],
   titanic: [],
   toltecs: [],
   tony: [],

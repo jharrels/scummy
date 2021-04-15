@@ -116,6 +116,16 @@ html {
   background-color: rgba(47, 59, 65, 0.7);
 }
 
+.menuButton.bright:hover {
+  color: white;
+  background-color: rgba(57,69,75);
+}
+
+.menuButton.bright:active {
+  color: rgba(47,59,65);
+  background-color: white;
+}
+
 .menuButton.active {
   background-color: rgba(255,255,255,0.7);
   color: rgba(27, 39, 45, 0.7);
@@ -412,7 +422,6 @@ Game Details
   width: calc(100vw - 300px);
   overflow-y: scroll;
   background: #1b262c;
-  border-top-left-radius: 5px;
   padding: 30px 30px 30px 30px;
   box-sizing: border-box;
   z-index: 3;
@@ -495,7 +504,7 @@ Dialog
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 5;
+  z-index: 10;
   display: none;
 }
 
@@ -556,7 +565,7 @@ Dialog
 
 .modal-button {
   float: right;
-  width: 40px;
+  width: 60px;
   padding: 10px 30px;
   font-size: 1em;
   color: white;
@@ -595,6 +604,42 @@ Dialog
 .modal-button.bright:active {
   background-color: white;
   color: rgba(27, 39, 45);
+}
+
+.modal-option-category {
+  margin: 30px 30px 0 30px;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #BBE1FA;
+}
+
+.modal-option {
+  margin: 10px 30px 0 30px;
+  font-size: 16px;
+  font-family: sans-serif;
+  color: white;
+}
+
+.modal-option.indent {
+  margin-left: 60px;
+}
+
+.modal-option > table {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: sans-serif;
+  color: white;
+}
+
+.modal-option  td {
+  padding: 0 0 10px 0;
+  width: 50%;
+}
+
+.modal-option td > select {
+  width: 100%;
 }
 
 .clear {

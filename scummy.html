@@ -85,8 +85,22 @@
       </div>
     </div>
   </div>
+  <div class="modal" id="game-configure-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category engine-options-header">
+          Engine Options
+        </div>
+        <div class="engine-options-wrapper">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="game-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="game-configure-modal-yes" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
   <div id="game-info">
-    <div class="menuButton" id="game-info-close">
+    <div class="menuButton bright" id="game-info-close">
       <i class="fas fa-times fa-fw"></i>
     </div>
     <div class="game-info-wrapper">
@@ -96,6 +110,8 @@
   </div>
   <script>let $ = require('jquery');</script>
   <script src="js/categories.js"></script>
+  <script src="js/engineoptions.js"></script>
+  <script src="js/generalgameoptions.js"></script>
   <script src="js/gamedata.js"></script>
   <script src="js/scummy.js"></script>
 </html>
