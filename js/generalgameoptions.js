@@ -72,9 +72,9 @@ generalGameOptions = {
       {"type": "slid", "label": "Subtitle Speed", "flag": "talkspeed", "default": 60, "min": 0, "max": 255},
     ],
     "volume": [
-      {"type": "slid", "label": "Music Volume", "flag": "", "default": 192, "min": 0, "max": 255},
-      {"type": "slid", "label": "Sound Effects Volume", "flag": "", "default": 192, "min": 0, "max": 255},
-      {"type": "slid", "label": "Speech Volume", "flag": "", "default": 192, "min": 0, "max": 255},
+      {"type": "slid", "label": "Music Volume", "flag": "music_volume", "default": 192, "min": 0, "max": 255},
+      {"type": "slid", "label": "Sound Effects Volume", "flag": "sfx_volume", "default": 192, "min": 0, "max": 255},
+      {"type": "slid", "label": "Speech Volume", "flag": "speech_volume", "default": 192, "min": 0, "max": 255},
     ],
     "paths": [
       {"type": "dir", "label": "Game Path", "flag": ""},

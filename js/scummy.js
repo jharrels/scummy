@@ -86,6 +86,14 @@ $("#override-graphics").on("click", function() {
   enableDisableGraphicsOptionsGui();
 });
 
+$("#override-audio").on("click", function() {
+  enableDisableAudioOptionsGui();
+});
+
+$("#override-volume").on("click", function() {
+  enableDisableVolumeOptionsGui();
+});
+
 $(".sideBar").on("mouseenter", () => {
   $(".sideBar").addClass("hasScrollBar");
 }).on("mouseleave", () => {
@@ -162,6 +170,16 @@ $("#game-configure-modal").on("click", ".graphic-option", function(e) {
   }
 });
 
+$("#game-configure-modal").on("click", ".audio-option", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  if (flag == "speech_mute") {
+    tempConfig[shortName][flag] = (!$(`#${flag}`).prop("checked"));
+  } else {
+    tempConfig[shortName][flag] = $(`#${flag}`).prop("checked");
+  }
+});
+
 $("#game-configure-modal").on("change", "select", function(e) {
   let flag = $(this).attr("id");
   let shortName = getGameShortName(selectedGame);
@@ -173,6 +191,13 @@ $("#game-configure-modal").on("change", "select", function(e) {
 });
 
 $("#game-configure-modal").on("input", ".audio-option-slider", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  tempConfig[shortName][flag] = $(this).val();
+  $(`#span-${flag}`).html($(this).val());
+});
+
+$("#game-configure-modal").on("input", ".volume-option-slider", function(e) {
   let flag = $(this).attr("id");
   let shortName = getGameShortName(selectedGame);
   tempConfig[shortName][flag] = $(this).val();
@@ -208,6 +233,8 @@ $("#game-configure-modal-cancel").on("click", () => {
 $("#game-configure-modal-save").on("click", () => {
   let shortName = getGameShortName(selectedGame);
   enableDisableGraphicsOptions(shortName);
+  enableDisableAudioOptions(shortName);
+  enableDisableVolumeOptions(shortName);
   scummvmConfig = JSON.parse(JSON.stringify(tempConfig));
   fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
   $("#game-configure-modal").fadeOut(250);
@@ -251,6 +278,18 @@ function enableDisableAudioOptions(gameShortName) {
   }
 }
 
+function enableDisableVolumeOptions(gameShortName) {
+  if ($("#override-volume").prop("checked")) {
+    tempConfig[gameShortName]['music_volume'] = $("#music_volume").val();
+    tempConfig[gameShortName]['sfx_volume'] = $("#sfx_volume").val();
+    tempConfig[gameShortName]['speech_volume'] = $("#speech_volume").val();
+  } else {
+    delete tempConfig[gameShortName]['music_volume'];
+    delete tempConfig[gameShortName]['sfx_volume'];
+    delete tempConfig[gameShortName]['speech_volume'];
+  }
+}
+
 function enableDisableGraphicsOptionsGui() {
   let gameShortName = getGameShortName(selectedGame);
   if ($("#override-graphics").prop("checked")) {
@@ -266,6 +305,15 @@ function enableDisableAudioOptionsGui() {
     $(".audio-options-wrapper").removeClass("disabled-option");
   } else {
     $(".audio-options-wrapper").addClass("disabled-option");
+  }
+}
+
+function enableDisableVolumeOptionsGui() {
+  let gameShortName = getGameShortName(selectedGame);
+  if ($("#override-volume").prop("checked")) {
+    $(".volume-options-wrapper").removeClass("disabled-option");
+  } else {
+    $(".volume-options-wrapper").addClass("disabled-option");
   }
 }
 
@@ -290,6 +338,13 @@ function audioOverridden(gameShortName) {
   return override;
 }
 
+function volumeOverridden(gameShortName) {
+  let override = false;
+  if ('music_volume' in scummvmConfig[gameShortName]) override = true;
+  if ('sfx_volume' in scummvmConfig[gameShortName]) override = true;
+  if ('speech_volume' in scummvmConfig[gameShortName]) override = true;
+  return override;
+}
 
 function getGameShortName(gameId) {
   let gameShortName = "";
@@ -430,6 +485,7 @@ function drawGameConfig() {
     }
     if (graphicsOverridden(gameShortName)) $("#override-graphics").prop("checked", true);
     if (audioOverridden(gameShortName)) $("#override-audio").prop("checked", true);
+    if (volumeOverridden(gameShortName)) $("#override-volume").prop("checked", true);
     enableDisableGraphicsOptionsGui();
     enableDisableAudioOptionsGui();
     $("#game-configure-modal-yes").show();
