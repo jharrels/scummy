@@ -6,6 +6,7 @@ html {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    user-select:none;
 }
 
 .sideBar {
@@ -108,6 +109,21 @@ html {
   color: rgba(255,255,255,0.7);
   margin: auto 5px;
   transition: background-color 0.25s, color 0.25s;
+  font-family: sans-serif;
+}
+
+.menuButton.bright {
+  background-color: rgba(47, 59, 65, 0.7);
+}
+
+.menuButton.bright:hover {
+  color: white;
+  background-color: rgba(57,69,75);
+}
+
+.menuButton.bright:active {
+  color: rgba(47,59,65);
+  background-color: white;
 }
 
 .menuButton.active {
@@ -142,6 +158,10 @@ html {
 
 .no-right-margin {
   margin-right: 0;
+}
+
+.no-bg {
+  background-color: none;
 }
 
 .main {
@@ -299,6 +319,21 @@ Scrollbars
     transition: box-shadow 0.25;
 }
 
+.modal-body.hasScrollBar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-body.hasScrollBar::-webkit-scrollbar-track {
+    background: none;
+}
+
+.modal-body.hasScrollBar::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 10px 10px #ddd;
+    border: solid 3px transparent;
+    border-radius: 20px;
+    transition: box-shadow 0.25;
+}
+
 .waiting {
   background-color: rgba(27, 39, 45, 0.7);
   position: absolute;
@@ -395,13 +430,83 @@ Game Details
 ----------------------------------------*/
 #game-info {
   position: absolute;
+  top: 0;
+  left: 300;
+  display: inline-block;
   height: calc(100vh - 30px);
   width: calc(100vw - 300px);
   overflow-y: scroll;
-  background: #BBE1FA;
-  border-top-left-radius: 5px;
-  padding: 60px 30px 30px 30px;
+  background: #1b262c;
+  padding: 30px 30px 30px 30px;
   box-sizing: border-box;
+  z-index: 3;
+  display: none;
+}
+
+.game-info-title {
+  box-sizing: border-box;
+  font-size: 40px;
+  font-family: sans-serif;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.game-info-boxart {
+  float: left;
+  display: inline-block;
+  width: 250px;
+  margin-right: 30px;
+}
+
+.game-info-boxart > img {
+  border-radius: 5px;
+  width: 250px;
+  height: auto;
+}
+
+#game-info-close {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
+.launch-config {
+  width: calc(100% - 280px);
+  float: right;
+  box-sizing: border-box;
+  display: inline-block;
+ }
+
+.game-info-wrapper {
+  margin-bottom: 10px;
+}
+
+.game-info-version {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #BBE1FA;
+}
+
+.game-info-favorite {
+  font-size: 20px;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 5px 15px;
+  text-align: center;
+  background-color: #c00;
+  box-sizing: border-box;
+  color: white;
+  width: 250px;
+  margin: 10px 30px 0 0;
+  font-family: sans-serif;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+hr {
+  opacity: 0.2;
+  border-top: 1px solid white;
+  border-bottom: none;
 }
 
 /*----------------------------------------
@@ -414,7 +519,7 @@ Dialog
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 5;
+  z-index: 10;
   display: none;
 }
 
@@ -465,6 +570,11 @@ Dialog
   text-align: center;
 }
 
+.modal > .modal-wrapper > .modal-body {
+  max-height: 70vh;
+  overflow-y: scroll;
+}
+
 .modal > .modal-wrapper > .modal-footer {
   position: relative;
   display: inline-block;
@@ -475,7 +585,7 @@ Dialog
 
 .modal-button {
   float: right;
-  width: 40px;
+  width: 60px;
   padding: 10px 30px;
   font-size: 1em;
   color: white;
@@ -514,6 +624,59 @@ Dialog
 .modal-button.bright:active {
   background-color: white;
   color: rgba(27, 39, 45);
+}
+
+.modal-option-category {
+  margin: 30px 30px 0 30px;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #BBE1FA;
+}
+
+.modal-option {
+  margin: 10px 30px 0 30px;
+  font-size: 16px;
+  font-family: sans-serif;
+  color: white;
+}
+
+.modal-option.indent {
+  margin-left: 60px;
+}
+
+.modal-option > table {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: sans-serif;
+  color: white;
+}
+
+.modal-option  td {
+  width: 50%;
+}
+
+.modal-option td > select {
+  width: 100%;
+}
+
+.modal-option > table > tr > td > .audio-option-slider {
+  width: 65%;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.modal-option > table > tr > td > .audio-option-value {
+  width: 25%;
+  display: inline-block;
+  margin-left: 10px;
+  box-sizing: border-box;
+}
+
+.disabled-option {
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .clear {

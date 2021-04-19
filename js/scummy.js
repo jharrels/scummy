@@ -16,6 +16,7 @@ const customTitlebar = require('custom-electron-titlebar');
 var devMode = true;
 var scummvmConfigPath = "";
 var scummvmConfig = {};
+var tempConfig = {};
 var installed;
 var favorites = [];
 var selectedGame = "";
@@ -77,11 +78,32 @@ $("#list-view").on("click", () => {
   }
 });
 
+$(".launch-config").on("click", ".configure", function(e) {
+  drawGameConfig();
+});
+
+$("#override-graphics").on("click", function() {
+  enableDisableGraphicsOptionsGui();
+});
+
+$("#override-audio").on("click", function() {
+  enableDisableAudioOptionsGui();
+});
+
+$("#override-volume").on("click", function() {
+  enableDisableVolumeOptionsGui();
+});
 
 $(".sideBar").on("mouseenter", () => {
   $(".sideBar").addClass("hasScrollBar");
 }).on("mouseleave", () => {
   $(".sideBar").removeClass("hasScrollBar");
+});
+
+$(".modal-body").on("mouseenter", () => {
+  $(".modal-body").addClass("hasScrollBar");
+}).on("mouseleave", () => {
+  $(".modal-body").removeClass("hasScrollBar");
 });
 
 $(".main").on("mouseenter", () => {
@@ -93,6 +115,11 @@ $(".main").on("mouseenter", () => {
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   launchGame(gameId);
+});
+
+$("#context-menu").on("click", ".manage", function(e) {
+  let gameId = $(this).attr("id");
+  drawGameInfo(gameId);
 });
 
 $(".main").on("contextmenu", ".game", function(e) {
@@ -117,6 +144,7 @@ $(".main").on("contextmenu", ".game", function(e) {
       $("#context-menu").children(".launch-items").append(menuItemObj);
     }
   }
+  $("#context-menu").children(".manage").attr("id", gameId);
   $("#context-menu").css({left: e.pageX-50, top: e.pageY-50}).fadeIn(250);
 });
 
@@ -124,6 +152,56 @@ $("#context-menu").on("mouseleave", () => {
   $("#context-menu").fadeOut(250);
   if (listMode == "gallery") $(`#${selectedGame}`).children("img").removeClass("active");
   if (listMode == "list") $(`#${selectedGame}`).removeClass("active");
+});
+
+$("#game-configure-modal").on("click", ".engine-option", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  tempConfig[shortName][flag] = $(`#${flag}`).prop("checked");
+});
+
+$("#game-configure-modal").on("click", ".graphic-option", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  if  ($(`#${flag}`).prop("checked")) {
+    tempConfig[shortName][flag] = $(`#${flag}`).prop("checked");
+  } else {
+    delete tempConfig[shortName][flag];
+  }
+});
+
+$("#game-configure-modal").on("click", ".audio-option", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  if (flag == "speech_mute") {
+    tempConfig[shortName][flag] = (!$(`#${flag}`).prop("checked"));
+  } else {
+    tempConfig[shortName][flag] = $(`#${flag}`).prop("checked");
+  }
+});
+
+$("#game-configure-modal").on("change", "select", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  if ($(this).val() == "default") {
+    delete tempConfig[shortName][flag]
+  } else {
+    tempConfig[shortName][flag] = $(this).val();
+  }
+});
+
+$("#game-configure-modal").on("input", ".audio-option-slider", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  tempConfig[shortName][flag] = $(this).val();
+  $(`#span-${flag}`).html($(this).val());
+});
+
+$("#game-configure-modal").on("input", ".volume-option-slider", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  tempConfig[shortName][flag] = $(this).val();
+  $(`#span-${flag}`).html($(this).val());
 });
 
 $("#add-modal-no").on("click", () => {
@@ -143,11 +221,132 @@ $("#unknown-modal-close").on("click", () => {
   hideModal("#unknown-modal");
 });
 
+$("#game-info-close").on("click", () => {
+  $("#game-info").fadeOut(250);
+});
+
+$("#game-configure-modal-cancel").on("click", () => {
+  tempConfig = {};
+  $("#game-configure-modal").fadeOut(250);
+});
+
+$("#game-configure-modal-save").on("click", () => {
+  let shortName = getGameShortName(selectedGame);
+  enableDisableGraphicsOptions(shortName);
+  enableDisableAudioOptions(shortName);
+  enableDisableVolumeOptions(shortName);
+  scummvmConfig = JSON.parse(JSON.stringify(tempConfig));
+  fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
+  $("#game-configure-modal").fadeOut(250);
+});
+
+
 /* ----------------------------------------------------------------------------
    FUNCTIONS
 ---------------------------------------------------------------------------- */
+function enableDisableGraphicsOptions(gameShortName) {
+  if ($("#override-graphics").prop("checked")) {
+    tempConfig[gameShortName]['gfx_mode'] = $("#gfx_mode").val();
+    tempConfig[gameShortName]['render_mode'] = $("#render_mode").val();
+    tempConfig[gameShortName]['stretch_mode'] = $("#stretch_mode").val();
+    tempConfig[gameShortName]['aspect_ratio'] = $("#aspect_ratio").prop("checked");
+    tempConfig[gameShortName]['fullscreen'] = $("#fullscreen").prop("checked");
+    tempConfig[gameShortName]['filtering'] = $("#filtering").prop("checked");
+  } else {
+    delete tempConfig[gameShortName]['gfx_mode'];
+    delete tempConfig[gameShortName]['render_mode'];
+    delete tempConfig[gameShortName]['stretch_mode'];
+    delete tempConfig[gameShortName]['aspect_ratio'];
+    delete tempConfig[gameShortName]['fullscreen'];
+    delete tempConfig[gameShortName]['filtering'];
+  }
+}
+
+function enableDisableAudioOptions(gameShortName) {
+  if ($("#override-audio").prop("checked")) {
+    tempConfig[gameShortName]['music_driver'] = $("#music_driver").val();
+    tempConfig[gameShortName]['opl_driver'] = $("#opl_driver").val();
+    tempConfig[gameShortName]['speech_mute'] = (!$("#speech_mute").prop("checked"));
+    tempConfig[gameShortName]['subtitles'] = $("#subtitles").prop("checked");
+    tempConfig[gameShortName]['talkspeed'] = $("#talkspeed").val();
+  } else {
+    delete tempConfig[gameShortName]['music_driver'];
+    delete tempConfig[gameShortName]['opl_driver'];
+    delete tempConfig[gameShortName]['speech_mute'];
+    delete tempConfig[gameShortName]['subtitles'];
+    delete tempConfig[gameShortName]['talkspeed'];
+  }
+}
+
+function enableDisableVolumeOptions(gameShortName) {
+  if ($("#override-volume").prop("checked")) {
+    tempConfig[gameShortName]['music_volume'] = $("#music_volume").val();
+    tempConfig[gameShortName]['sfx_volume'] = $("#sfx_volume").val();
+    tempConfig[gameShortName]['speech_volume'] = $("#speech_volume").val();
+  } else {
+    delete tempConfig[gameShortName]['music_volume'];
+    delete tempConfig[gameShortName]['sfx_volume'];
+    delete tempConfig[gameShortName]['speech_volume'];
+  }
+}
+
+function enableDisableGraphicsOptionsGui() {
+  let gameShortName = getGameShortName(selectedGame);
+  if ($("#override-graphics").prop("checked")) {
+    $(".graphics-options-wrapper").removeClass("disabled-option");
+  } else {
+    $(".graphics-options-wrapper").addClass("disabled-option");
+  }
+}
+
+function enableDisableAudioOptionsGui() {
+  let gameShortName = getGameShortName(selectedGame);
+  if ($("#override-audio").prop("checked")) {
+    $(".audio-options-wrapper").removeClass("disabled-option");
+  } else {
+    $(".audio-options-wrapper").addClass("disabled-option");
+  }
+}
+
+function enableDisableVolumeOptionsGui() {
+  let gameShortName = getGameShortName(selectedGame);
+  if ($("#override-volume").prop("checked")) {
+    $(".volume-options-wrapper").removeClass("disabled-option");
+  } else {
+    $(".volume-options-wrapper").addClass("disabled-option");
+  }
+}
+
+function graphicsOverridden(gameShortName) {
+  let override = false;
+  if ('gfx_mode' in scummvmConfig[gameShortName]) override = true;
+  if ('render_mode' in scummvmConfig[gameShortName]) override = true;
+  if ('stretch_mode' in scummvmConfig[gameShortName]) override = true;
+  if ('aspect_ratio' in scummvmConfig[gameShortName]) override = true;
+  if ('fullscreen' in scummvmConfig[gameShortName]) override = true;
+  if ('filtering' in scummvmConfig[gameShortName]) override = true;
+  return override;
+}
+
+function audioOverridden(gameShortName) {
+  let override = false;
+  if ('music_driver' in scummvmConfig[gameShortName]) override = true;
+  if ('opl_driver' in scummvmConfig[gameShortName]) override = true;
+  if ('speech_mute' in scummvmConfig[gameShortName]) override = true;
+  if ('subtitles' in scummvmConfig[gameShortName]) override = true;
+  if ('talkspeed' in scummvmConfig[gameShortName]) override = true;
+  return override;
+}
+
+function volumeOverridden(gameShortName) {
+  let override = false;
+  if ('music_volume' in scummvmConfig[gameShortName]) override = true;
+  if ('sfx_volume' in scummvmConfig[gameShortName]) override = true;
+  if ('speech_volume' in scummvmConfig[gameShortName]) override = true;
+  return override;
+}
+
 function getGameShortName(gameId) {
-  console.log(gameId);
   let gameShortName = "";
   for (i=0; i<installed[gameId]['versions'].length; i++) {
     gameShortName = installed[gameId]['versions'][i]['versionShortName'];
@@ -176,6 +375,125 @@ function launchGame(gameId) {
   });
 }
 
+function drawGameConfig() {
+  tempConfig = JSON.parse(JSON.stringify(scummvmConfig));
+  $(".engine-options-wrapper").html("");
+  $(".graphics-options-wrapper").html("");
+  $(".audio-options-wrapper").html("");
+  $(".volume-options-wrapper").html("");
+  let engine = gameData[selectedGame]['engine'];
+  if (engineOptions[engine].length == 0) {
+    let optionObj = $("<div></div>", {"class": "modal-option"}).text("There are no configuration options for this engine.");
+    $(".engine-options-wrapper").append(optionObj);
+    $("#game-configure-modal-yes").hide();
+    $("#game-configure-modal-cancel").html("OK");
+  } else {
+    let gameShortName = getGameShortName(selectedGame);
+    for (i=0; i<engineOptions[engine].length; i++) {
+      let option = engineOptions[engine][i];
+      inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "engine-option"});
+      optionObj = $("<div></div>", {"class": "modal-option"}).html(inputObj).append(` ${option['shortDesc']}`);
+      $(".engine-options-wrapper").append(optionObj);
+      if (tempConfig[gameShortName][option['flag']]) {
+        $(`#${option['flag']}`).prop("checked", true);
+      }
+    }
+    for (i=0; i<generalGameOptions['graphics'].length; i++) {
+      let option = generalGameOptions['graphics'][i];
+      if (option['type'] == "bool") {
+        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "graphic-option"});
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
+        $(".graphics-options-wrapper").append(optionObj);
+        if (tempConfig[gameShortName][option['flag']]) $(`#${option['flag']}`).prop("checked", true);
+      }
+      if (option['type'] == "list") {
+        selectObj = $("<select></select>", {"id": option['flag']});
+        for (o=0; o<option['values'].length; o++) {
+          let selectOption = option['values'][o];
+          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+          $(selectObj).append(optionObj);
+        }
+        tdLabelObj = $("<td></td>").html(option['label']);
+        tdSelectObj = $("<td></td>").html(selectObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".graphics-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+    }
+    for (i=0; i<generalGameOptions['audio'].length; i++) {
+      let option = generalGameOptions['audio'][i];
+      if (option['type'] == "bool") {
+        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "audio-option"});
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
+        $(".audio-options-wrapper").append(optionObj);
+        if (option['mode'] == "invert") {
+          if (tempConfig[gameShortName][option['flag']]) {
+            $(`#${option['flag']}`).prop("checked", false);
+          } else {
+            $(`#${option['flag']}`).prop("checked", true);
+          }
+        } else {
+          if (tempConfig[gameShortName][option['flag']]) {
+            $(`#${option['flag']}`).prop("checked", true);
+          } else {
+            $(`#${option['flag']}`).prop("checked", false);
+          }
+        }
+      }
+      if (option['type'] == "list") {
+        selectObj = $("<select></select>", {"id": option['flag']});
+        for (o=0; o<option['values'].length; o++) {
+          let selectOption = option['values'][o];
+          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+          $(selectObj).append(optionObj);
+        }
+        tdLabelObj = $("<td></td>").html(option['label']);
+        tdSelectObj = $("<td></td>").html(selectObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".audio-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+      if (option['type'] == "slid") {
+        inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "audio-option-slider"});
+        tdLabelObj = $("<td></td>").html(option['label']);
+        valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "audio-option-value"}).text(tempConfig[gameShortName][option['flag']]);
+        tdInputObj = $("<td></td>").html(inputObj).append(valObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".audio-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+    }
+    for (i=0; i<generalGameOptions['volume'].length; i++) {
+      let option = generalGameOptions['volume'][i];
+      if (option['type'] == "slid") {
+        inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "volume-option-slider"});
+        tdLabelObj = $("<td></td>").html(option['label']);
+        valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "volume-option-value"}).text(tempConfig[gameShortName][option['flag']]);
+        tdInputObj = $("<td></td>").html(inputObj).append(valObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".volume-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+    }
+    if (graphicsOverridden(gameShortName)) $("#override-graphics").prop("checked", true);
+    if (audioOverridden(gameShortName)) $("#override-audio").prop("checked", true);
+    if (volumeOverridden(gameShortName)) $("#override-volume").prop("checked", true);
+    enableDisableGraphicsOptionsGui();
+    enableDisableAudioOptionsGui();
+    $("#game-configure-modal-yes").show();
+    $("#game-configure-modal-cancel").html("Cancel");
+  }
+  showModal("#game-configure-modal");
+}
+
 function drawCategories() {
   $("#sideBarCategories").html("");
   $("#all").html(Object.keys(installed).length);
@@ -195,6 +513,54 @@ function drawCategories() {
       $("#sideBarCategories").append(tmpObject);
     }
   });
+}
+
+function drawGameInfo(gameId) {
+  selectedGame = gameId;
+  let category = gameData[gameId]['category'];
+  let imagePath = `boxart/${category}/${gameId}.jpg`;
+  try {
+    fs.accessSync(imagePath, fs.constants.R_OK);
+  } catch(err) {
+     imagePath = "boxart/missing.jpg";
+  }
+  let gameImageObj = $("<img></img", {"src": imagePath});
+  let favoriteTextObj = $("<i></i>", {"class": "far fa-heart"});
+  let favoriteObj = $("<div></div>", {"class": "game-info-favorite"}).html(favoriteTextObj).append(" Favorite");
+  let titleObj = $("<div></div>", {"class": "game-info-title"});
+  $(".launch-config").html(titleObj);
+  $(".game-info-title").html(installed[gameId]['name']);
+  $(".game-info-boxart").html(gameImageObj).append(favoriteObj);
+  for (i=0; i<installed[gameId]['versions'].length; i++) {
+    if (installed[gameId]['versions'][i]['version'] == "Default") {
+      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+      let menuItemObj = $("<div></div>", {"class": "menu-button"}).html(menuIconObj).append(" Play");
+      let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
+      let cfgItemObj = $("<div></div>", {"class": "game-info-configure"}).html(cfgIconObj);
+      let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
+      let defaultItemObj = $("<div></div>", {"class": "game-info-default"}).html(defaultIconObj);
+      let wrapperObj = $("<div></div>").html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
+      $(".launch-config").append(wrapperObj);
+    } else {
+      let versionObj = $("<span></span>", {"class":"game-info-version"}).text(installed[gameId]['versions'][i]['version']);
+      let wrapperObj = $("<div></div>", {"class": "game-info-wrapper"}).html(versionObj);
+      $(".launch-config").append(wrapperObj);
+      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+      let menuItemObj = $("<div></div>", {"class": "menuButton no-left-margin bright play"}).html(menuIconObj).append(" Play");
+      let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
+      let cfgItemObj = $("<div></div>", {"class": "menuButton bright configure"}).html(cfgIconObj).append(" Configure");
+      let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
+      let defaultItemObj = $("<div></div>", {"class": "menuButton bright default"}).html(defaultIconObj).append(" Default");;
+      wrapperObj = $("<div></div>", {"class": "game-info-wrapper", "id": i}).html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
+      $(".launch-config").append(wrapperObj);
+      if (i < installed[gameId]['versions'].length - 1) {
+        let hrObj = $("<hr>", {"class": "game-info-divider"});
+        $(".launch-config").append(hrObj);
+      }
+    }
+  }
+  $("#context-menu").fadeOut(250);
+  $("#game-info").fadeIn(250);
 }
 
 function drawGames() {
@@ -367,7 +733,6 @@ function detectGame(gamePath) {
           if (installed[shortName]['versions'][i]['version'] == parsedGameName[2]) alreadyInstalled = true;
         }
       }
-      console.log(alreadyInstalled);
       if (alreadyInstalled) {
         let imageObj = $("<img></img", {"src": imagePath});
         $("#exists-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
