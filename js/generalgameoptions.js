@@ -41,24 +41,41 @@ generalGameOptions = {
       {"type": "bool", "label": "Aspect Ratio Correction", "flag": "aspect_ratio"},
       {"type": "bool", "label": "Fullscreen mode", "flag": "fullscreen"},
       {"type": "bool", "label": "Filter Graphics", "flag": "filtering"}
-    ]
-  },
-  {
+    ],
     "audio": [
-      {"type": "list", "label": "Music Device", "flag": "", "values": []},
-      {"type": "list", "label": "Adlib Emulator", "flag": "", "values": []},
-      {"type": "enum", "label": "Text and Speech", "flag": "", "values": []},
-      {"type": "slid", "label": "Subtitle Speed", "flag": "", "default": 60, "min": 0, "max": 255},
-    ]
-  },
-  {
+      {"type": "list", "label": "Music Device", "flag": "music_driver", "values": [
+        {"value": "auto", "text": "<default>"},
+        {"value": "null", "text": "No music"},
+        {"value": "windows", "text": "Windows MIDI"},
+        {"value": "fluidsynth", "text": "FluidSynth"},
+        {"value": "mt32", "text": "MT-32 emulator"},
+        {"value": "adlib", "text": "AdLib emulator"},
+        {"value": "pcspk", "text": "PC Speaker emulator"},
+        {"value": "pcjr", "text": "IBM PCjr emulator"},
+        {"value": "cms", "text": "Creative Music System emulator"},
+        {"value": "C64", "text": "C64 Audio emulator"},
+        {"value": "amiga", "text": "Amiga Audio emulator"},
+        {"value": "towns", "text": "Fm-Towns Audio"},
+        {"value": "pc98", "text": "PC-98 Audio"},
+        {"value": "segacd", "text": "SegaCD Audio"}
+      ]},
+      {"type": "list", "label": "Adlib Emulator", "flag": "opl_driver", "values": [
+        {"value": "default", "text": "<default>"},
+        {"value": "mame", "text": "MAME OPL Emulator"},
+        {"value": "db", "text": "DOSBox OPL Emulator"},
+        {"value": "nuked", "text": "Nuked OPL Emulator"},
+        {"value": "opl2lpt", "text": "OPL2LPT"},
+        {"value": "opl3lpt", "text": "OPL3LPT"}
+      ]},
+      {"type": "bool", "label": "Speech", "flag": "speech_mute", "mode": "invert"},
+      {"type": "bool", "label": "Subtitles", "flag": "subtitles"},
+      {"type": "slid", "label": "Subtitle Speed", "flag": "talkspeed", "default": 60, "min": 0, "max": 255},
+    ],
     "volume": [
       {"type": "slid", "label": "Music Volume", "flag": "", "default": 192, "min": 0, "max": 255},
       {"type": "slid", "label": "Sound Effects Volume", "flag": "", "default": 192, "min": 0, "max": 255},
       {"type": "slid", "label": "Speech Volume", "flag": "", "default": 192, "min": 0, "max": 255},
-    ]
-  },
-  {
+    ],
     "paths": [
       {"type": "dir", "label": "Game Path", "flag": ""},
       {"type": "dir", "label": "Save Path", "flag": ""},

@@ -661,6 +661,19 @@ Dialog
   width: 100%;
 }
 
+.modal-option > table > tr > td > .audio-option-slider {
+  width: 65%;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.modal-option > table > tr > td > .audio-option-value {
+  width: 25%;
+  display: inline-block;
+  margin-left: 10px;
+  box-sizing: border-box;
+}
+
 .disabled-option {
   opacity: 0.3;
   pointer-events: none;

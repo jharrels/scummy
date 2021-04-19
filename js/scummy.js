@@ -79,57 +79,7 @@ $("#list-view").on("click", () => {
 });
 
 $(".launch-config").on("click", ".configure", function(e) {
-  tempConfig = JSON.parse(JSON.stringify(scummvmConfig));
-  $(".engine-options-wrapper").html("");
-  $(".graphics-options-wrapper").html("");
-  let engine = gameData[selectedGame]['engine'];
-  if (engineOptions[engine].length == 0) {
-    let optionObj = $("<div></div>", {"class": "modal-option"}).text("There are no configuration options for this engine.");
-    $(".engine-options-wrapper").append(optionObj);
-    $("#game-configure-modal-yes").hide();
-    $("#game-configure-modal-cancel").html("OK");
-  } else {
-    let gameShortName = getGameShortName(selectedGame);
-    for (i=0; i<engineOptions[engine].length; i++) {
-      let option = engineOptions[engine][i];
-      inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "engine-option"});
-      optionObj = $("<div></div>", {"class": "modal-option"}).html(inputObj).append(` ${option['shortDesc']}`);
-      $(".engine-options-wrapper").append(optionObj);
-      if (tempConfig[gameShortName][option['flag']]) {
-        $(`#${option['flag']}`).prop("checked", true);
-      }
-    }
-    for (i=0; i<generalGameOptions['graphics'].length; i++) {
-      let option = generalGameOptions['graphics'][i];
-      if (option['type'] == "bool") {
-        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "graphic-option"});
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
-        $(".graphics-options-wrapper").append(optionObj);
-        console.log(tempConfig[gameShortName][option['flag']]);
-        if (tempConfig[gameShortName][option['flag']]) $(`#${option['flag']}`).prop("checked", true);
-      }
-      if (option['type'] == "list") {
-        selectObj = $("<select></select>", {"id": option['flag']});
-        for (o=0; o<option['values'].length; o++) {
-          let selectOption = option['values'][o];
-          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
-          $(selectObj).append(optionObj);
-        }
-        tdLabelObj = $("<td></td>").html(option['label']);
-        tdSelectObj = $("<td></td>").html(selectObj);
-        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
-        tableObj = $("<table></table>").html(trObj);
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
-        $(".graphics-options-wrapper").append(optionObj);
-        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
-      }
-    }
-    if (graphicsOverridden(gameShortName)) $("#override-graphics").prop("checked", true);
-    enableDisableGraphicsOptionsGui();
-    $("#game-configure-modal-yes").show();
-    $("#game-configure-modal-cancel").html("Cancel");
-  }
-  showModal("#game-configure-modal");
+  drawGameConfig();
 });
 
 $("#override-graphics").on("click", function() {
@@ -220,8 +170,13 @@ $("#game-configure-modal").on("change", "select", function(e) {
   } else {
     tempConfig[shortName][flag] = $(this).val();
   }
-  console.log("In change event");
-  console.log(tempConfig[shortName]);
+});
+
+$("#game-configure-modal").on("input", ".audio-option-slider", function(e) {
+  let flag = $(this).attr("id");
+  let shortName = getGameShortName(selectedGame);
+  tempConfig[shortName][flag] = $(this).val();
+  $(`#span-${flag}`).html($(this).val());
 });
 
 $("#add-modal-no").on("click", () => {
@@ -280,12 +235,37 @@ function enableDisableGraphicsOptions(gameShortName) {
   }
 }
 
+function enableDisableAudioOptions(gameShortName) {
+  if ($("#override-audio").prop("checked")) {
+    tempConfig[gameShortName]['music_driver'] = $("#music_driver").val();
+    tempConfig[gameShortName]['opl_driver'] = $("#opl_driver").val();
+    tempConfig[gameShortName]['speech_mute'] = (!$("#speech_mute").prop("checked"));
+    tempConfig[gameShortName]['subtitles'] = $("#subtitles").prop("checked");
+    tempConfig[gameShortName]['talkspeed'] = $("#talkspeed").val();
+  } else {
+    delete tempConfig[gameShortName]['music_driver'];
+    delete tempConfig[gameShortName]['opl_driver'];
+    delete tempConfig[gameShortName]['speech_mute'];
+    delete tempConfig[gameShortName]['subtitles'];
+    delete tempConfig[gameShortName]['talkspeed'];
+  }
+}
+
 function enableDisableGraphicsOptionsGui() {
   let gameShortName = getGameShortName(selectedGame);
   if ($("#override-graphics").prop("checked")) {
     $(".graphics-options-wrapper").removeClass("disabled-option");
   } else {
     $(".graphics-options-wrapper").addClass("disabled-option");
+  }
+}
+
+function enableDisableAudioOptionsGui() {
+  let gameShortName = getGameShortName(selectedGame);
+  if ($("#override-audio").prop("checked")) {
+    $(".audio-options-wrapper").removeClass("disabled-option");
+  } else {
+    $(".audio-options-wrapper").addClass("disabled-option");
   }
 }
 
@@ -300,8 +280,18 @@ function graphicsOverridden(gameShortName) {
   return override;
 }
 
+function audioOverridden(gameShortName) {
+  let override = false;
+  if ('music_driver' in scummvmConfig[gameShortName]) override = true;
+  if ('opl_driver' in scummvmConfig[gameShortName]) override = true;
+  if ('speech_mute' in scummvmConfig[gameShortName]) override = true;
+  if ('subtitles' in scummvmConfig[gameShortName]) override = true;
+  if ('talkspeed' in scummvmConfig[gameShortName]) override = true;
+  return override;
+}
+
+
 function getGameShortName(gameId) {
-  console.log(gameId);
   let gameShortName = "";
   for (i=0; i<installed[gameId]['versions'].length; i++) {
     gameShortName = installed[gameId]['versions'][i]['versionShortName'];
@@ -328,6 +318,124 @@ function launchGame(gameId) {
   scummvm.on('exit', (code) => {
     hideWaiting();
   });
+}
+
+function drawGameConfig() {
+  tempConfig = JSON.parse(JSON.stringify(scummvmConfig));
+  $(".engine-options-wrapper").html("");
+  $(".graphics-options-wrapper").html("");
+  $(".audio-options-wrapper").html("");
+  $(".volume-options-wrapper").html("");
+  let engine = gameData[selectedGame]['engine'];
+  if (engineOptions[engine].length == 0) {
+    let optionObj = $("<div></div>", {"class": "modal-option"}).text("There are no configuration options for this engine.");
+    $(".engine-options-wrapper").append(optionObj);
+    $("#game-configure-modal-yes").hide();
+    $("#game-configure-modal-cancel").html("OK");
+  } else {
+    let gameShortName = getGameShortName(selectedGame);
+    for (i=0; i<engineOptions[engine].length; i++) {
+      let option = engineOptions[engine][i];
+      inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "engine-option"});
+      optionObj = $("<div></div>", {"class": "modal-option"}).html(inputObj).append(` ${option['shortDesc']}`);
+      $(".engine-options-wrapper").append(optionObj);
+      if (tempConfig[gameShortName][option['flag']]) {
+        $(`#${option['flag']}`).prop("checked", true);
+      }
+    }
+    for (i=0; i<generalGameOptions['graphics'].length; i++) {
+      let option = generalGameOptions['graphics'][i];
+      if (option['type'] == "bool") {
+        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "graphic-option"});
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
+        $(".graphics-options-wrapper").append(optionObj);
+        if (tempConfig[gameShortName][option['flag']]) $(`#${option['flag']}`).prop("checked", true);
+      }
+      if (option['type'] == "list") {
+        selectObj = $("<select></select>", {"id": option['flag']});
+        for (o=0; o<option['values'].length; o++) {
+          let selectOption = option['values'][o];
+          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+          $(selectObj).append(optionObj);
+        }
+        tdLabelObj = $("<td></td>").html(option['label']);
+        tdSelectObj = $("<td></td>").html(selectObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".graphics-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+    }
+    for (i=0; i<generalGameOptions['audio'].length; i++) {
+      let option = generalGameOptions['audio'][i];
+      if (option['type'] == "bool") {
+        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "audio-option"});
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
+        $(".audio-options-wrapper").append(optionObj);
+        if (option['mode'] == "invert") {
+          if (tempConfig[gameShortName][option['flag']]) {
+            $(`#${option['flag']}`).prop("checked", false);
+          } else {
+            $(`#${option['flag']}`).prop("checked", true);
+          }
+        } else {
+          if (tempConfig[gameShortName][option['flag']]) {
+            $(`#${option['flag']}`).prop("checked", true);
+          } else {
+            $(`#${option['flag']}`).prop("checked", false);
+          }
+        }
+      }
+      if (option['type'] == "list") {
+        selectObj = $("<select></select>", {"id": option['flag']});
+        for (o=0; o<option['values'].length; o++) {
+          let selectOption = option['values'][o];
+          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+          $(selectObj).append(optionObj);
+        }
+        tdLabelObj = $("<td></td>").html(option['label']);
+        tdSelectObj = $("<td></td>").html(selectObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".audio-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+      if (option['type'] == "slid") {
+        inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "audio-option-slider"});
+        tdLabelObj = $("<td></td>").html(option['label']);
+        valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "audio-option-value"}).text(tempConfig[gameShortName][option['flag']]);
+        tdInputObj = $("<td></td>").html(inputObj).append(valObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".audio-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+    }
+    for (i=0; i<generalGameOptions['volume'].length; i++) {
+      let option = generalGameOptions['volume'][i];
+      if (option['type'] == "slid") {
+        inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "volume-option-slider"});
+        tdLabelObj = $("<td></td>").html(option['label']);
+        valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "volume-option-value"}).text(tempConfig[gameShortName][option['flag']]);
+        tdInputObj = $("<td></td>").html(inputObj).append(valObj);
+        trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
+        tableObj = $("<table></table>").html(trObj);
+        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+        $(".volume-options-wrapper").append(optionObj);
+        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+      }
+    }
+    if (graphicsOverridden(gameShortName)) $("#override-graphics").prop("checked", true);
+    if (audioOverridden(gameShortName)) $("#override-audio").prop("checked", true);
+    enableDisableGraphicsOptionsGui();
+    enableDisableAudioOptionsGui();
+    $("#game-configure-modal-yes").show();
+    $("#game-configure-modal-cancel").html("Cancel");
+  }
+  showModal("#game-configure-modal");
 }
 
 function drawCategories() {
@@ -569,7 +677,6 @@ function detectGame(gamePath) {
           if (installed[shortName]['versions'][i]['version'] == parsedGameName[2]) alreadyInstalled = true;
         }
       }
-      console.log(alreadyInstalled);
       if (alreadyInstalled) {
         let imageObj = $("<img></img", {"src": imagePath});
         $("#exists-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
