@@ -529,7 +529,9 @@ function drawGameInfo(gameId) {
   let favoriteObj = $("<div></div>", {"class": "game-info-favorite"}).html(favoriteTextObj).append(" Favorite");
   let titleObj = $("<div></div>", {"class": "game-info-title"});
   $(".launch-config").html(titleObj);
-  $(".game-info-title").html(installed[gameId]['name']);
+  let longName = installed[gameId]['name'];
+  if (longName.substr(-5, 5) == ", The") longName = "The "+longName.substr(0,longName.length - 5);
+  $(".game-info-title").html(longName);
   $(".game-info-boxart").html(gameImageObj).append(favoriteObj);
   for (i=0; i<installed[gameId]['versions'].length; i++) {
     if (installed[gameId]['versions'][i]['version'] == "Default") {
@@ -641,7 +643,11 @@ function getInstalledGames() {
           if (testId in installed) {
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
           } else {
-            installed[testId] = {"name": parsedGameName[1].trim(), "versions": []};
+            let longName = parsedGameName[1].trim();
+            let firstLetter = longName.charAt(0).toUpperCase();
+            longName = firstLetter + longName.slice(1);
+            if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";
+            installed[testId] = {"name": longName, "versions": []};
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
             defaultVersions[testId] = rawGameId;
           }
