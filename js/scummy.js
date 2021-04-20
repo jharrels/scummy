@@ -382,13 +382,13 @@ function drawGameConfig() {
   $(".audio-options-wrapper").html("");
   $(".volume-options-wrapper").html("");
   let engine = gameData[selectedGame]['engine'];
+  let gameShortName = getGameShortName(selectedGame);
   if (engineOptions[engine].length == 0) {
     let optionObj = $("<div></div>", {"class": "modal-option"}).text("There are no configuration options for this engine.");
     $(".engine-options-wrapper").append(optionObj);
     $("#game-configure-modal-yes").hide();
     $("#game-configure-modal-cancel").html("OK");
   } else {
-    let gameShortName = getGameShortName(selectedGame);
     for (i=0; i<engineOptions[engine].length; i++) {
       let option = engineOptions[engine][i];
       inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "engine-option"});
@@ -398,99 +398,99 @@ function drawGameConfig() {
         $(`#${option['flag']}`).prop("checked", true);
       }
     }
-    for (i=0; i<generalGameOptions['graphics'].length; i++) {
-      let option = generalGameOptions['graphics'][i];
-      if (option['type'] == "bool") {
-        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "graphic-option"});
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
-        $(".graphics-options-wrapper").append(optionObj);
-        if (tempConfig[gameShortName][option['flag']]) $(`#${option['flag']}`).prop("checked", true);
-      }
-      if (option['type'] == "list") {
-        selectObj = $("<select></select>", {"id": option['flag']});
-        for (o=0; o<option['values'].length; o++) {
-          let selectOption = option['values'][o];
-          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
-          $(selectObj).append(optionObj);
-        }
-        tdLabelObj = $("<td></td>").html(option['label']);
-        tdSelectObj = $("<td></td>").html(selectObj);
-        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
-        tableObj = $("<table></table>").html(trObj);
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
-        $(".graphics-options-wrapper").append(optionObj);
-        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
-      }
-    }
-    for (i=0; i<generalGameOptions['audio'].length; i++) {
-      let option = generalGameOptions['audio'][i];
-      if (option['type'] == "bool") {
-        inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "audio-option"});
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
-        $(".audio-options-wrapper").append(optionObj);
-        if (option['mode'] == "invert") {
-          if (tempConfig[gameShortName][option['flag']]) {
-            $(`#${option['flag']}`).prop("checked", false);
-          } else {
-            $(`#${option['flag']}`).prop("checked", true);
-          }
-        } else {
-          if (tempConfig[gameShortName][option['flag']]) {
-            $(`#${option['flag']}`).prop("checked", true);
-          } else {
-            $(`#${option['flag']}`).prop("checked", false);
-          }
-        }
-      }
-      if (option['type'] == "list") {
-        selectObj = $("<select></select>", {"id": option['flag']});
-        for (o=0; o<option['values'].length; o++) {
-          let selectOption = option['values'][o];
-          optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
-          $(selectObj).append(optionObj);
-        }
-        tdLabelObj = $("<td></td>").html(option['label']);
-        tdSelectObj = $("<td></td>").html(selectObj);
-        trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
-        tableObj = $("<table></table>").html(trObj);
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
-        $(".audio-options-wrapper").append(optionObj);
-        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
-      }
-      if (option['type'] == "slid") {
-        inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "audio-option-slider"});
-        tdLabelObj = $("<td></td>").html(option['label']);
-        valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "audio-option-value"}).text(tempConfig[gameShortName][option['flag']]);
-        tdInputObj = $("<td></td>").html(inputObj).append(valObj);
-        trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
-        tableObj = $("<table></table>").html(trObj);
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
-        $(".audio-options-wrapper").append(optionObj);
-        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
-      }
-    }
-    for (i=0; i<generalGameOptions['volume'].length; i++) {
-      let option = generalGameOptions['volume'][i];
-      if (option['type'] == "slid") {
-        inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "volume-option-slider"});
-        tdLabelObj = $("<td></td>").html(option['label']);
-        valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "volume-option-value"}).text(tempConfig[gameShortName][option['flag']]);
-        tdInputObj = $("<td></td>").html(inputObj).append(valObj);
-        trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
-        tableObj = $("<table></table>").html(trObj);
-        optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
-        $(".volume-options-wrapper").append(optionObj);
-        if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
-      }
-    }
-    if (graphicsOverridden(gameShortName)) $("#override-graphics").prop("checked", true);
-    if (audioOverridden(gameShortName)) $("#override-audio").prop("checked", true);
-    if (volumeOverridden(gameShortName)) $("#override-volume").prop("checked", true);
-    enableDisableGraphicsOptionsGui();
-    enableDisableAudioOptionsGui();
-    $("#game-configure-modal-yes").show();
-    $("#game-configure-modal-cancel").html("Cancel");
   }
+  for (i=0; i<generalGameOptions['graphics'].length; i++) {
+    let option = generalGameOptions['graphics'][i];
+    if (option['type'] == "bool") {
+      inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "graphic-option"});
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
+      $(".graphics-options-wrapper").append(optionObj);
+      if (tempConfig[gameShortName][option['flag']]) $(`#${option['flag']}`).prop("checked", true);
+    }
+    if (option['type'] == "list") {
+      selectObj = $("<select></select>", {"id": option['flag']});
+      for (o=0; o<option['values'].length; o++) {
+        let selectOption = option['values'][o];
+        optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+        $(selectObj).append(optionObj);
+      }
+      tdLabelObj = $("<td></td>").html(option['label']);
+      tdSelectObj = $("<td></td>").html(selectObj);
+      trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+      tableObj = $("<table></table>").html(trObj);
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+      $(".graphics-options-wrapper").append(optionObj);
+      if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+    }
+  }
+  for (i=0; i<generalGameOptions['audio'].length; i++) {
+    let option = generalGameOptions['audio'][i];
+    if (option['type'] == "bool") {
+      inputObj = $("<input>", {"type": "checkbox", "id": option['flag'], "class": "audio-option"});
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(inputObj).append(` ${option['label']}`);
+      $(".audio-options-wrapper").append(optionObj);
+      if (option['mode'] == "invert") {
+        if (tempConfig[gameShortName][option['flag']]) {
+          $(`#${option['flag']}`).prop("checked", false);
+        } else {
+          $(`#${option['flag']}`).prop("checked", true);
+        }
+      } else {
+        if (tempConfig[gameShortName][option['flag']]) {
+          $(`#${option['flag']}`).prop("checked", true);
+        } else {
+          $(`#${option['flag']}`).prop("checked", false);
+        }
+      }
+    }
+    if (option['type'] == "list") {
+      selectObj = $("<select></select>", {"id": option['flag']});
+      for (o=0; o<option['values'].length; o++) {
+        let selectOption = option['values'][o];
+        optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+        $(selectObj).append(optionObj);
+      }
+      tdLabelObj = $("<td></td>").html(option['label']);
+      tdSelectObj = $("<td></td>").html(selectObj);
+      trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+      tableObj = $("<table></table>").html(trObj);
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+      $(".audio-options-wrapper").append(optionObj);
+      if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+    }
+    if (option['type'] == "slid") {
+      inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "audio-option-slider"});
+      tdLabelObj = $("<td></td>").html(option['label']);
+      valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "audio-option-value"}).text(tempConfig[gameShortName][option['flag']]);
+      tdInputObj = $("<td></td>").html(inputObj).append(valObj);
+      trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
+      tableObj = $("<table></table>").html(trObj);
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+      $(".audio-options-wrapper").append(optionObj);
+      if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+    }
+  }
+  for (i=0; i<generalGameOptions['volume'].length; i++) {
+    let option = generalGameOptions['volume'][i];
+    if (option['type'] == "slid") {
+      inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "volume-option-slider"});
+      tdLabelObj = $("<td></td>").html(option['label']);
+      valObj = $("<span></span>", {"id": `span-${option['flag']}`, "class": "volume-option-value"}).text(tempConfig[gameShortName][option['flag']]);
+      tdInputObj = $("<td></td>").html(inputObj).append(valObj);
+      trObj = $("<tr></tr>").append(tdLabelObj).append(tdInputObj);
+      tableObj = $("<table></table>").html(trObj);
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+      $(".volume-options-wrapper").append(optionObj);
+      if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+    }
+  }
+  if (graphicsOverridden(gameShortName)) $("#override-graphics").prop("checked", true);
+  if (audioOverridden(gameShortName)) $("#override-audio").prop("checked", true);
+  if (volumeOverridden(gameShortName)) $("#override-volume").prop("checked", true);
+  enableDisableGraphicsOptionsGui();
+  enableDisableAudioOptionsGui();
+  $("#game-configure-modal-yes").show();
+  $("#game-configure-modal-cancel").html("Cancel");
   showModal("#game-configure-modal");
 }
 
