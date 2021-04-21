@@ -20,6 +20,7 @@ var tempConfig = {};
 var installed;
 var favorites = [];
 var selectedGame = "";
+var selectedConfig = "";
 var defaultVersion;
 var importGamePath = "";
 
@@ -79,6 +80,8 @@ $("#list-view").on("click", () => {
 });
 
 $(".launch-config").on("click", ".configure", function(e) {
+  let configName = $(this).parent().data("version");
+  selectedConfig = configName;
   drawGameConfig();
 });
 
@@ -169,13 +172,13 @@ $("#context-menu").on("mouseleave", () => {
 
 $("#game-configure-modal").on("click", ".engine-option", function(e) {
   let flag = $(this).attr("id");
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   tempConfig[shortName][flag] = $(`#${flag}`).prop("checked");
 });
 
 $("#game-configure-modal").on("click", ".graphic-option", function(e) {
   let flag = $(this).attr("id");
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   if  ($(`#${flag}`).prop("checked")) {
     tempConfig[shortName][flag] = $(`#${flag}`).prop("checked");
   } else {
@@ -185,7 +188,7 @@ $("#game-configure-modal").on("click", ".graphic-option", function(e) {
 
 $("#game-configure-modal").on("click", ".audio-option", function(e) {
   let flag = $(this).attr("id");
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   if (flag == "speech_mute") {
     tempConfig[shortName][flag] = (!$(`#${flag}`).prop("checked"));
   } else {
@@ -195,7 +198,7 @@ $("#game-configure-modal").on("click", ".audio-option", function(e) {
 
 $("#game-configure-modal").on("change", "select", function(e) {
   let flag = $(this).attr("id");
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   if ($(this).val() == "default") {
     delete tempConfig[shortName][flag]
   } else {
@@ -205,14 +208,14 @@ $("#game-configure-modal").on("change", "select", function(e) {
 
 $("#game-configure-modal").on("input", ".audio-option-slider", function(e) {
   let flag = $(this).attr("id");
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   tempConfig[shortName][flag] = $(this).val();
   $(`#span-${flag}`).html($(this).val());
 });
 
 $("#game-configure-modal").on("input", ".volume-option-slider", function(e) {
   let flag = $(this).attr("id");
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   tempConfig[shortName][flag] = $(this).val();
   $(`#span-${flag}`).html($(this).val());
 });
@@ -244,7 +247,7 @@ $("#game-configure-modal-cancel").on("click", () => {
 });
 
 $("#game-configure-modal-save").on("click", () => {
-  let shortName = getGameShortName(selectedGame);
+  let shortName = selectedConfig;
   enableDisableGraphicsOptions(shortName);
   enableDisableAudioOptions(shortName);
   enableDisableVolumeOptions(shortName);
@@ -304,7 +307,6 @@ function enableDisableVolumeOptions(gameShortName) {
 }
 
 function enableDisableGraphicsOptionsGui() {
-  let gameShortName = getGameShortName(selectedGame);
   if ($("#override-graphics").prop("checked")) {
     $(".graphics-options-wrapper").removeClass("disabled-option");
   } else {
@@ -313,7 +315,6 @@ function enableDisableGraphicsOptionsGui() {
 }
 
 function enableDisableAudioOptionsGui() {
-  let gameShortName = getGameShortName(selectedGame);
   if ($("#override-audio").prop("checked")) {
     $(".audio-options-wrapper").removeClass("disabled-option");
   } else {
@@ -322,7 +323,6 @@ function enableDisableAudioOptionsGui() {
 }
 
 function enableDisableVolumeOptionsGui() {
-  let gameShortName = getGameShortName(selectedGame);
   if ($("#override-volume").prop("checked")) {
     $(".volume-options-wrapper").removeClass("disabled-option");
   } else {
@@ -359,15 +359,6 @@ function volumeOverridden(gameShortName) {
   return override;
 }
 
-function getGameShortName(gameId) {
-  return selectedVersion;
-  let gameShortName = "";
-  for (i=0; i<installed[gameId]['versions'].length; i++) {
-    gameShortName = installed[gameId]['versions'][i]['versionShortName'];
-  }
-  return gameShortName;
-}
-
 function launchGame(gameId, shortName) {
   let launchOptions = [];
   let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
@@ -395,7 +386,7 @@ function drawGameConfig() {
   $(".audio-options-wrapper").html("");
   $(".volume-options-wrapper").html("");
   let engine = gameData[selectedGame]['engine'];
-  let gameShortName = getGameShortName(selectedGame);
+  let gameShortName = selectedConfig;
   if (engineOptions[engine].length == 0) {
     let optionObj = $("<div></div>", {"class": "modal-option"}).text("There are no configuration options for this engine.");
     $(".engine-options-wrapper").append(optionObj);
