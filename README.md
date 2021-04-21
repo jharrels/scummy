@@ -115,7 +115,7 @@ Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few ex
 * **0.2.0** - ~~Display the list of installed games using either a grid view or a list view.~~ :heavy_check_mark:
 * **0.3.0** - ~~Install games via Scummy, including detecting an uninstalled game or a new version of an installed game.~~ :heavy_check_mark:
 * **0.4.0** - ~~Ability to configure options for installed games.~~ :heavy_check_mark:
-* 0.5.0 - Launch games, including different versions of games.
+* **0.5.0** - ~~Launch games, including different versions of games.~~ :heavy_check_mark:
 * 0.6.0 - Remove installed games.
 * 0.7.0 - Favoriting of games.
 * 0.8.0 - Set default games.

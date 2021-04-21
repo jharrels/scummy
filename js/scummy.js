@@ -20,7 +20,7 @@ var tempConfig = {};
 var installed;
 var favorites = [];
 var selectedGame = "";
-var defaultVersions;
+var defaultVersion;
 var importGamePath = "";
 
 //Menu.setApplicationMenu(null);
@@ -82,6 +82,11 @@ $(".launch-config").on("click", ".configure", function(e) {
   drawGameConfig();
 });
 
+$(".launch-config").on("click", ".play", function(e) {
+  let gameShortName = $(this).parent().data("version");
+  launchGame(selectedGame, gameShortName);
+});
+
 $("#override-graphics").on("click", function() {
   enableDisableGraphicsOptionsGui();
 });
@@ -114,12 +119,19 @@ $(".main").on("mouseenter", () => {
 
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
-  launchGame(gameId);
+  let version = $(this).data("version");
+  launchGame(gameId, version);
 });
 
 $("#context-menu").on("click", ".manage", function(e) {
   let gameId = $(this).attr("id");
   drawGameInfo(gameId);
+});
+
+$("#context-menu").on("click", ".play", function(e) {
+  let shortName = $(this).data("version");
+  let id = $(this).data("id");
+  launchGame(id, shortName);
 });
 
 $(".main").on("contextmenu", ".game", function(e) {
@@ -136,10 +148,11 @@ $(".main").on("contextmenu", ".game", function(e) {
     } else {
       let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
       let menuItemObj;
-      if (installed[gameId]['versions'][i]['versionShortName'] == defaultVersions[gameId]) {
-        menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append("Play "+installed[gameId]['versions'][i]['version']+" <i class='fas fa-star'></i>");
+      let versionShortName = installed[gameId]['versions'][i]['versionShortName'];
+      if (versionShortName == defaultVersion[gameId]) {
+        menuItemObj = $("<div></div>", {"class": "play menu-item", "data-id": gameId, "data-version": versionShortName}).html(menuIconObj).append("Play "+installed[gameId]['versions'][i]['version']+" <i class='fas fa-star'></i>");
       } else {
-        menuItemObj = $("<div></div>", {"class": "play menu-item"}).html(menuIconObj).append("Play "+installed[gameId]['versions'][i]['version']);
+        menuItemObj = $("<div></div>", {"class": "play menu-item", "data-id": gameId, "data-version": versionShortName}).html(menuIconObj).append("Play "+installed[gameId]['versions'][i]['version']);
       }
       $("#context-menu").children(".launch-items").append(menuItemObj);
     }
@@ -347,6 +360,7 @@ function volumeOverridden(gameShortName) {
 }
 
 function getGameShortName(gameId) {
+  return selectedVersion;
   let gameShortName = "";
   for (i=0; i<installed[gameId]['versions'].length; i++) {
     gameShortName = installed[gameId]['versions'][i]['versionShortName'];
@@ -354,9 +368,8 @@ function getGameShortName(gameId) {
   return gameShortName;
 }
 
-function launchGame(gameId) {
+function launchGame(gameId, shortName) {
   let launchOptions = [];
-  let shortName = getGameShortName(gameId);
   let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
   let tempConfigPath = writeTempConfig(shortName);
   launchOptions.push(`--config="${tempConfigPath}"`);
@@ -534,31 +547,22 @@ function drawGameInfo(gameId) {
   $(".game-info-title").html(longName);
   $(".game-info-boxart").html(gameImageObj).append(favoriteObj);
   for (i=0; i<installed[gameId]['versions'].length; i++) {
-    if (installed[gameId]['versions'][i]['version'] == "Default") {
-      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
-      let menuItemObj = $("<div></div>", {"class": "menu-button"}).html(menuIconObj).append(" Play");
-      let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
-      let cfgItemObj = $("<div></div>", {"class": "game-info-configure"}).html(cfgIconObj);
-      let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
-      let defaultItemObj = $("<div></div>", {"class": "game-info-default"}).html(defaultIconObj);
-      let wrapperObj = $("<div></div>").html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
-      $(".launch-config").append(wrapperObj);
-    } else {
-      let versionObj = $("<span></span>", {"class":"game-info-version"}).text(installed[gameId]['versions'][i]['version']);
-      let wrapperObj = $("<div></div>", {"class": "game-info-wrapper"}).html(versionObj);
-      $(".launch-config").append(wrapperObj);
-      let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
-      let menuItemObj = $("<div></div>", {"class": "menuButton no-left-margin bright play"}).html(menuIconObj).append(" Play");
-      let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
-      let cfgItemObj = $("<div></div>", {"class": "menuButton bright configure"}).html(cfgIconObj).append(" Configure");
-      let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
-      let defaultItemObj = $("<div></div>", {"class": "menuButton bright default"}).html(defaultIconObj).append(" Default");;
-      wrapperObj = $("<div></div>", {"class": "game-info-wrapper", "id": i}).html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
-      $(".launch-config").append(wrapperObj);
-      if (i < installed[gameId]['versions'].length - 1) {
-        let hrObj = $("<hr>", {"class": "game-info-divider"});
-        $(".launch-config").append(hrObj);
-      }
+    let gameVersionId = installed[gameId]['versions'][i]['versionShortName'];
+    let versionObj = $("<span></span>", {"class":"game-info-version"}).text(installed[gameId]['versions'][i]['version']);
+    let wrapperObj = $("<div></div>", {"class": "game-info-wrapper"}).html(versionObj);
+    $(".launch-config").append(wrapperObj);
+    let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
+    let menuItemObj = $("<div></div>", {"class": "menuButton no-left-margin bright play"}).html(menuIconObj).append(" Play");
+    let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
+    let cfgItemObj = $("<div></div>", {"class": "menuButton bright configure"}).html(cfgIconObj).append(" Configure");
+    let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
+    let defaultItemObj = $("<div></div>", {"class": "menuButton bright default"}).html(defaultIconObj).append(" Default");
+    wrapperObj = $("<div></div>", {"class": "game-info-wrapper", "id": i, "data-version": gameVersionId})
+      .html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
+    $(".launch-config").append(wrapperObj);
+    if (i < installed[gameId]['versions'].length - 1) {
+      let hrObj = $("<hr>", {"class": "game-info-divider"});
+      $(".launch-config").append(hrObj);
     }
   }
   $("#context-menu").fadeOut(250);
@@ -585,7 +589,8 @@ function drawGames() {
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let gameNameObj = $("<span></span>").text(key);
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key]}).append(gameImageObj).append(gameNameObj);
+      let sdefault = defaultVersion[longNames[key]];
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
     });
   }
@@ -602,7 +607,7 @@ function drawGames() {
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let gameNameObj = $("<span></span>").text(key);
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key]}).append(gameImageObj).append(gameNameObj);
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
       $("#list").append(rowObj);
     });
   }
@@ -610,7 +615,7 @@ function drawGames() {
 
 function getInstalledGames() {
   installed = {};
-  defaultVersions = {};
+  defaultVersion = {};
   let rawData = "";
   let scummvm = spawn('scummvm.exe', ['--list-targets'], {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
 
@@ -649,7 +654,7 @@ function getInstalledGames() {
             if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";
             installed[testId] = {"name": longName, "versions": []};
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
-            defaultVersions[testId] = rawGameId;
+            defaultVersion[testId] = rawGameId;
           }
         } else {
           numPieces--;
