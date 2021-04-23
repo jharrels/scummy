@@ -576,6 +576,7 @@ function drawGames() {
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
+        console.log(`Missing: boxart/${category}/${longNames[key]}.jpg`);
          imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
