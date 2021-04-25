@@ -43,22 +43,7 @@ generalGameOptions = {
       {"type": "bool", "label": "Filter Graphics", "flag": "filtering"}
     ],
     "audio": [
-      {"type": "list", "label": "Music Device", "flag": "music_driver", "values": [
-        {"value": "auto", "text": "<default>"},
-        {"value": "null", "text": "No music"},
-        {"value": "windows", "text": "Windows MIDI"},
-        {"value": "fluidsynth", "text": "FluidSynth"},
-        {"value": "mt32", "text": "MT-32 emulator"},
-        {"value": "adlib", "text": "AdLib emulator"},
-        {"value": "pcspk", "text": "PC Speaker emulator"},
-        {"value": "pcjr", "text": "IBM PCjr emulator"},
-        {"value": "cms", "text": "Creative Music System emulator"},
-        {"value": "C64", "text": "C64 Audio emulator"},
-        {"value": "amiga", "text": "Amiga Audio emulator"},
-        {"value": "towns", "text": "Fm-Towns Audio"},
-        {"value": "pc98", "text": "PC-98 Audio"},
-        {"value": "segacd", "text": "SegaCD Audio"}
-      ]},
+      {"type": "nlst", "label": "Music Device", "flag": "music_driver", "source": "list-audio-drivers"},
       {"type": "list", "label": "Adlib Emulator", "flag": "opl_driver", "values": [
         {"value": "default", "text": "<default>"},
         {"value": "mame", "text": "MAME OPL Emulator"},

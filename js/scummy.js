@@ -23,6 +23,7 @@ var selectedGame = "";
 var selectedConfig = "";
 var defaultVersion;
 var importGamePath = "";
+var audioDevices = [];
 
 //Menu.setApplicationMenu(null);
 
@@ -42,6 +43,7 @@ $(`#${listMode}-view`).addClass("active");
 getScummvmConfigPath();
 loadScummvmConfig();
 getInstalledGames();
+getAudioDevices();
 
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
@@ -462,6 +464,21 @@ function drawGameConfig() {
       $(".audio-options-wrapper").append(optionObj);
       if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
     }
+    if (option['type'] == "nlst") {
+      selectObj = $("<select></select>", {"id": option['flag']});
+      for (o=0; o<audioDevices.length; o++) {
+        let selectOption = audioDevices[o];
+        optionObj = $("<option></option>", {"value": selectOption['value']}).text(selectOption['text']);
+        $(selectObj).append(optionObj);
+      }
+      tdLabelObj = $("<td></td>").html(option['label']);
+      tdSelectObj = $("<td></td>").html(selectObj);
+      trObj = $("<tr></tr>").append(tdLabelObj).append(tdSelectObj);
+      tableObj = $("<table></table>").html(trObj);
+      optionObj = $("<div></div>", {"class": "modal-option indent"}).html(tableObj);
+      $(".audio-options-wrapper").append(optionObj);
+      if (option['flag'] in tempConfig[gameShortName]) $(`#${option['flag']}`).val(tempConfig[gameShortName][option['flag']]);
+    }
     if (option['type'] == "slid") {
       inputObj = $("<input>", {"type": "range", "id": option['flag'], "min": option['min'], "max": option['max'], "value": option['default'], "class": "audio-option-slider"});
       tdLabelObj = $("<td></td>").html(option['label']);
@@ -784,6 +801,31 @@ function importGame(gamePath) {
     loadScummvmConfig();
     getInstalledGames();
     drawGames();
+  })
+}
+
+function getAudioDevices() {
+  audioDevices = [];
+  let launchOptions = ['--list-audio-devices'];
+  let rawData = "";
+  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  scummvm.stdout.on('data', (data) => {
+    rawData += data.toString();
+  });
+
+  scummvm.stderr.on('data', (data) => {
+  });
+
+  scummvm.on('exit', (code) => {
+    rawDataList = rawData.split("\r\n");
+    for (i=2; i<rawDataList.length; i++) {
+      let parsedData = rawDataList[i].match(/"(.+?)"(.+)/);
+      if (parsedData) {
+        let value = parsedData[1];
+        let text = parsedData[2].trim();
+        audioDevices.push({"value": value, "text": text});
+      }
+    }
   })
 }
 
