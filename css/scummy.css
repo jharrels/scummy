@@ -121,9 +121,28 @@ html {
   background-color: rgba(57,69,75);
 }
 
-.menuButton.bright:active {
+.menuButton.bright:active,
+.menuButton.bright-red:active {
   color: rgba(47,59,65);
   background-color: white;
+}
+
+.menuButton.bright-red {
+  background-color: rgba(225, 0, 0, 0.7);
+}
+
+.menuButton.bright-red:hover {
+  color: white;
+  background-color: rgba(225,0,0);
+}
+
+.menuButton.bright-green {
+  background-color: rgba(0, 225, 0, 0.7);
+}
+
+.menuButton.bright-green:hover {
+  color: white;
+  background-color: rgba(0,225,0);
 }
 
 .menuButton.active {

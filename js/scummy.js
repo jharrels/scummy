@@ -92,6 +92,27 @@ $(".launch-config").on("click", ".play", function(e) {
   launchGame(selectedGame, gameShortName);
 });
 
+$(".launch-config").on("click", ".remove", function(e) {
+  let category = gameData[selectedGame]['category'];
+  let imagePath = `boxart/${category}/${selectedGame}.jpg`;
+  try {
+    fs.accessSync(imagePath, fs.constants.R_OK);
+  } catch(err) {
+     imagePath = "boxart/missing.jpg";
+  }
+  selectedConfig = $(this).parent().data("version");
+  let imageObj = $("<img></img", {"src": imagePath});
+  $("#remove-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
+  let versionString = "";
+  for (i=0; i<installed[selectedGame]['versions'].length; i++) {
+    if (installed[selectedGame]['versions'][i]['versionShortName'] == selectedConfig) versionString = installed[selectedGame]['versions'][i]['version'];
+  }
+  let versionObj = $("<small></small>").text(`(${versionString})`);
+  let gameNameObj = $("<span></span>", {"class": "game-name"}).text(installed[selectedGame]['name']).append(versionObj);
+  $("#remove-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("Remove this game from SCUMMVM?");
+  showModal("#remove-modal");
+});
+
 $("#override-graphics").on("click", function() {
   enableDisableGraphicsOptionsGui();
 });
@@ -229,6 +250,17 @@ $("#add-modal-no").on("click", () => {
 $("#add-modal-yes").on("click", () => {
   hideModal("#add-modal");
   importGame(importGamePath);
+});
+
+$("#remove-modal-no").on("click", () => {
+  hideModal("#remove-modal");
+});
+
+$("#remove-modal-yes").on("click", () => {
+  removeGame(selectedConfig);
+  selectedConfig = "";
+  selectedGame = "";
+  hideModal("#remove-modal");
 });
 
 $("#exists-modal-close").on("click", () => {
@@ -560,13 +592,15 @@ function drawGameInfo(gameId) {
     let wrapperObj = $("<div></div>", {"class": "game-info-wrapper"}).html(versionObj);
     $(".launch-config").append(wrapperObj);
     let menuIconObj = $("<i></i>", {"class": "fas fa-play fa-fw"});
-    let menuItemObj = $("<div></div>", {"class": "menuButton no-left-margin bright play"}).html(menuIconObj).append(" Play");
+    let menuItemObj = $("<div></div>", {"class": "menuButton no-left-margin bright-green play"}).html(menuIconObj).append(" Play");
     let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
     let cfgItemObj = $("<div></div>", {"class": "menuButton bright configure"}).html(cfgIconObj).append(" Configure");
     let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
     let defaultItemObj = $("<div></div>", {"class": "menuButton bright default"}).html(defaultIconObj).append(" Default");
+    let removeIconObj = $("<i></i>", {"class": "fas fa-trash fa-fw"});
+    let removeItemObj = $("<div></div>", {"class": "menuButton bright-red remove"}).html(removeIconObj).append(" Remove");
     wrapperObj = $("<div></div>", {"class": "game-info-wrapper", "id": i, "data-version": gameVersionId})
-      .html(menuItemObj).append(cfgItemObj).append(defaultItemObj);
+      .html(menuItemObj).append(cfgItemObj).append(defaultItemObj).append(removeItemObj);
     $(".launch-config").append(wrapperObj);
     if (i < installed[gameId]['versions'].length - 1) {
       let hrObj = $("<hr>", {"class": "game-info-divider"});
@@ -827,6 +861,15 @@ function getAudioDevices() {
       }
     }
   })
+}
+
+function removeGame(configName) {
+  delete scummvmConfig[configName];
+  console.log(scummvmConfig);
+  fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
+  getInstalledGames();
+  drawGames();
+  $("#game-info-close").trigger("click");
 }
 
 function showModal(modalId) {
