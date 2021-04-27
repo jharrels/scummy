@@ -1,6 +1,6 @@
 {
   "name": "Scummy",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "A front end for SCUMMVM.",
   "main": "init.js",
   "scripts": {
