@@ -426,6 +426,16 @@ Scrollbars
   transition: all .25s;
 }
 
+#context-menu > .favorite {
+  color: #f55;
+  transition: all .25s;
+}
+
+#context-menu > .favorite.active {
+  color: #f55;
+  transition: all .25s;
+}
+
 #context-menu > .play:hover,
 #context-menu > .launch-items > .play:hover {
   background-color: #0c0;
@@ -434,6 +444,16 @@ Scrollbars
 
 #context-menu > .manage:hover {
   background-color: #ccc;
+  color: rgba(27, 39, 45);
+}
+
+#context-menu > .favorite:hover {
+  background-color: #f55;
+  color: rgba(27, 39, 45);
+}
+
+#context-menu > .favorite.active:hover {
+  background-color: #f55;
   color: rgba(27, 39, 45);
 }
 
@@ -513,12 +533,48 @@ Game Details
   display: inline-block;
   padding: 5px 15px;
   text-align: center;
-  background-color: #c00;
+  border: 1px solid #f55;
   box-sizing: border-box;
-  color: white;
+  color: #f55;
   width: 250px;
   margin: 10px 30px 0 0;
   font-family: sans-serif;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.game-info-favorite:hover {
+  background-color: rgba(255, 96, 96, .1);
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.game-info-favorite:active,
+.game-info-favorite.active:active {
+  background-color: white !important;
+  color: rgba(27, 39, 45);
+  border: 1px solid white;
+  transition: none;
+}
+
+.game-info-favorite.active {
+  font-size: 20px;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 5px 15px;
+  text-align: center;
+  border: 1px solid #f55;
+  background-color: #f55;
+  box-sizing: border-box;
+  color: #fff;
+  width: 250px;
+  margin: 10px 30px 0 0;
+  font-family: sans-serif;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.game-info-favorite.active:hover {
+  border: 1px solid #f77;
+  background-color: #f77;
+  box-sizing: border-box;
   transition: background-color 0.25s, color 0.25s;
 }
 
@@ -719,4 +775,8 @@ Dialog
 
 .warning-color {
   color: #ffa100;
+}
+
+.favorite-pink {
+  color: #f55;
 }

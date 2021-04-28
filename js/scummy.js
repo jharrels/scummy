@@ -18,7 +18,6 @@ var scummvmConfigPath = "";
 var scummvmConfig = {};
 var tempConfig = {};
 var installed;
-var favorites = [];
 var selectedGame = "";
 var selectedConfig = "";
 var defaultVersion;
@@ -38,6 +37,9 @@ let titlebar = new customTitlebar.Titlebar({
 ---------------------------------------------------------------------------- */
 var listMode = store.get('listMode');
 if (listMode === undefined) listMode = "gallery";
+var favorites = store.get('favorites');
+if (favorites === undefined) favorites = [];
+
 $(`#${listMode}-view`).addClass("active");
 
 getScummvmConfigPath();
@@ -113,6 +115,22 @@ $(".launch-config").on("click", ".remove", function(e) {
   showModal("#remove-modal");
 });
 
+$(".game-info-boxart").on("click", ".game-info-favorite", function(e) {
+  if (favorites.includes(selectedGame)) {
+    let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart"});
+    $(this).removeClass("active").html(favoriteTextObj).append(" Favorite");
+    favorites.splice(favorites.indexOf(selectedGame),1);
+    $(`#${selectedGame}`).find("span").find("i").remove();
+  } else {
+    let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
+    $(this).addClass("active").html(favoriteTextObj).append(" Unfavorite");
+    favorites.push(selectedGame);
+    $(`#${selectedGame}`).find("span").prepend("<i class='fas fa-heart fa-fw favorite-pink'></i>");
+  }
+  store.set('favorites', favorites);
+  $("#favorites").html(favorites.length);
+});
+
 $("#override-graphics").on("click", function() {
   enableDisableGraphicsOptionsGui();
 });
@@ -160,6 +178,23 @@ $("#context-menu").on("click", ".play", function(e) {
   launchGame(id, shortName);
 });
 
+$("#context-menu").on("click", ".favorite", function(e) {
+  if (favorites.includes(selectedGame)) {
+    let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart"});
+    $(this).removeClass("active").html(favoriteTextObj).append(" Favorite");
+    favorites.splice(favorites.indexOf(selectedGame),1);
+    $(`#${selectedGame}`).find("span").find("i").remove();
+  } else {
+    let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
+    $(this).addClass("active").html(favoriteTextObj).append(" Favorite");
+    favorites.push(selectedGame);
+    $(`#${selectedGame}`).find("span").prepend("<i class='fas fa-heart fa-fw favorite-pink'></i>");
+  }
+  store.set('favorites', favorites);
+  $("#favorites").html(favorites.length);
+  $("#context-menu").fadeOut(250);
+});
+
 $(".main").on("contextmenu", ".game", function(e) {
   let gameId = $(this).attr("id");
   selectedGame = gameId;
@@ -182,6 +217,12 @@ $(".main").on("contextmenu", ".game", function(e) {
       }
       $("#context-menu").children(".launch-items").append(menuItemObj);
     }
+  }
+  if (favorites.includes(selectedGame)) {
+    console.log(favorites.includes(selectedGame));
+    $("#context-menu").find(".favorite").html("<i class='fas fa-heart-broken fa-fw'></i> Unfavorite").addClass("active");
+  } else {
+    $("#context-menu").find(".favorite").html("<i class='fas fa-heart fa-fw'></i> Favorite").removeClass("active");
   }
   $("#context-menu").children(".manage").attr("id", gameId);
   $("#context-menu").css({left: e.pageX-50, top: e.pageY-50}).fadeIn(250);
@@ -607,6 +648,11 @@ function drawGameInfo(gameId) {
       $(".launch-config").append(hrObj);
     }
   }
+  if (favorites.includes(selectedGame)) {
+    let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
+    $(".game-info-favorite").addClass("active").html(favoriteTextObj).append(" Unfavorite").addClass("active");
+
+  }
   $("#context-menu").fadeOut(250);
   $("#game-info").fadeIn(250);
 }
@@ -631,7 +677,9 @@ function drawGames() {
          imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
-      let gameNameObj = $("<span></span>").text(key);
+      let favoriteObj = "";
+      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      let gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
@@ -649,7 +697,9 @@ function drawGames() {
          imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
-      let gameNameObj = $("<span></span>").text(key);
+      let favoriteObj = "";
+      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
       $("#list").append(rowObj);
     });
