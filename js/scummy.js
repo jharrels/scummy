@@ -40,6 +40,8 @@ var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
 var defaultVersion = store.get('defaultVersion');
 if (defaultVersion === undefined) defaultVersion = {};
+var selectedCategory = store.get('selectedCategory');
+if (selectedCategory === undefined) selectedCategory = "all";
 
 console.log(defaultVersion);
 
@@ -132,6 +134,7 @@ $(".game-info-boxart").on("click", ".game-info-favorite", function(e) {
     $(this).removeClass("active").html(favoriteTextObj).append(" Favorite");
     favorites.splice(favorites.indexOf(selectedGame),1);
     $(`#${selectedGame}`).find("span").find("i").remove();
+    if (selectedCategory == "favorites") $(`#${selectedGame}`).remove();
   } else {
     let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
     $(this).addClass("active").html(favoriteTextObj).append(" Unfavorite");
@@ -172,6 +175,14 @@ $(".main").on("mouseenter", () => {
   $(".main").removeClass("hasScrollBar");
 });
 
+$(".sideBar").on("click", ".sideBarItem", function(e) {
+  $(".sideBarItem").removeClass("selected");
+  $(this).addClass("selected");
+  selectedCategory = $(this).attr("id").split("-")[1];
+  store.set('selectedCategory', selectedCategory);
+  drawGames();
+});
+
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   let version = defaultVersion[gameId];
@@ -195,6 +206,7 @@ $("#context-menu").on("click", ".favorite", function(e) {
     $(this).removeClass("active").html(favoriteTextObj).append(" Favorite");
     favorites.splice(favorites.indexOf(selectedGame),1);
     $(`#${selectedGame}`).find("span").find("i").remove();
+    if (selectedCategory == "favorites") $(`#${selectedGame}`).remove();
   } else {
     let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
     $(this).addClass("active").html(favoriteTextObj).append(" Favorite");
@@ -613,10 +625,11 @@ function drawCategories() {
     if (installedCategories[key] > 0) {
       let tmpIcon = $("<i></i>", {"class": "fas fa-bookmark fa-fw bookmark"});
       let tmpCount = $("<span></span>", {"class":"badge"}).text(installedCategories[key]);
-      let tmpObject = $("<div></div>", {"class":"sideBarItem", "id":key}).text(categories[key]).prepend(tmpIcon).append(tmpCount);
+      let tmpObject = $("<div></div>", {"class":"sideBarItem", "id": `category-${key}`}).text(categories[key]).prepend(tmpIcon).append(tmpCount);
       $("#sideBarCategories").append(tmpObject);
     }
   });
+  $(`#category-${selectedCategory}`).addClass("selected");
 }
 
 function drawGameInfo(gameId) {
@@ -673,9 +686,21 @@ function drawGames() {
   $("#grid").remove();
   $("#list").remove();
   let longNames = {};
-  Object.keys(installed).forEach(key => {
-    longNames[installed[key]['name']] = key;
-  });
+  if (selectedCategory == "all") {
+    Object.keys(installed).forEach(key => {
+      longNames[installed[key]['name']] = key;
+    });
+  }
+  if (selectedCategory == "favorites") {
+    favorites.forEach(key => {
+      longNames[installed[key]['name']] = key;
+    });
+  }
+  if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
+    Object.keys(installed).forEach(key => {
+      if (selectedCategory == gameData[key]['category']) longNames[installed[key]['name']] = key;
+    });
+  }
   if (listMode == "gallery") {
     let grid = $("<div></div>", {"id": "grid"});
     $(".main").html("").append(grid);

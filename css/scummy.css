@@ -46,20 +46,20 @@ html {
   opacity: 1.0;
 }
 
-.sideBarItem.select > i.bookmark {
-  color: #080;
+.sideBarItem.selected > i.bookmark {
+  color: #0a0;
 }
 
-.sideBarItem.select > i.favorite {
-  color: #800;
+.sideBarItem.selected > i.all {
+  color: #256fdd;
 }
 
-.sideBarItem.select > i.bookmark {
-  color: #080;
+.sideBarItem.selected > i.favorites {
+  color: #f55;
 }
 
-.sideBarItem:hover > i {
-  opacity: 1.0;
+.sideBarItem.selected > i.recent {
+  color: #e6ae1e;
 }
 
 .sideBarItem:hover > i {
