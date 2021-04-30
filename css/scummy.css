@@ -116,13 +116,38 @@ html {
   background-color: rgba(47, 59, 65, 0.7);
 }
 
+.menuButton.default {
+  color: #cc0;
+  background-color: rgba(191, 191, 0, 0.0);
+  border: 1px solid #cc0;
+}
+
+.menuButton.default.active{
+  color: rgba(255,255,255,0.7);
+  background-color: rgba(191, 191, 0, 0.7);
+  border: 1px solid #cc0;
+}
+
+.menuButton.default.active:hover {
+  color: rgba(255,255,255);
+  background-color: rgba(191, 191, 0);
+  border: 1px solid #cc0;
+}
+
+.menuButton.default:hover {
+  color: #dd1;
+  background-color: rgba(191, 191, 0, 0.1);
+}
+
+
 .menuButton.bright:hover {
   color: white;
   background-color: rgba(57,69,75);
 }
 
 .menuButton.bright:active,
-.menuButton.bright-red:active {
+.menuButton.bright-red:active,
+.menuButton.default:active {
   color: rgba(47,59,65);
   background-color: white;
 }

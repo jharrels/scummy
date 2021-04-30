@@ -20,7 +20,6 @@ var tempConfig = {};
 var installed;
 var selectedGame = "";
 var selectedConfig = "";
-var defaultVersion;
 var importGamePath = "";
 var audioDevices = [];
 
@@ -39,6 +38,10 @@ var listMode = store.get('listMode');
 if (listMode === undefined) listMode = "gallery";
 var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
+var defaultVersion = store.get('defaultVersion');
+if (defaultVersion === undefined) defaultVersion = {};
+
+console.log(defaultVersion);
 
 $(`#${listMode}-view`).addClass("active");
 
@@ -87,6 +90,14 @@ $(".launch-config").on("click", ".configure", function(e) {
   let configName = $(this).parent().data("version");
   selectedConfig = configName;
   drawGameConfig();
+});
+
+$(".launch-config").on("click", ".default", function(e) {
+  let configName = $(this).parent().data("version");
+  selectedConfig = configName;
+  defaultVersion[selectedGame] = configName;
+  store.set('defaultVersion', defaultVersion);
+  drawGameInfo(selectedGame);
 });
 
 $(".launch-config").on("click", ".play", function(e) {
@@ -163,7 +174,7 @@ $(".main").on("mouseenter", () => {
 
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
-  let version = $(this).data("version");
+  let version = defaultVersion[gameId];
   launchGame(gameId, version);
 });
 
@@ -219,7 +230,6 @@ $(".main").on("contextmenu", ".game", function(e) {
     }
   }
   if (favorites.includes(selectedGame)) {
-    console.log(favorites.includes(selectedGame));
     $("#context-menu").find(".favorite").html("<i class='fas fa-heart-broken fa-fw'></i> Unfavorite").addClass("active");
   } else {
     $("#context-menu").find(".favorite").html("<i class='fas fa-heart fa-fw'></i> Favorite").removeClass("active");
@@ -637,7 +647,9 @@ function drawGameInfo(gameId) {
     let cfgIconObj = $("<i></i>", {"class": "fas fa-cog fa-fw"});
     let cfgItemObj = $("<div></div>", {"class": "menuButton bright configure"}).html(cfgIconObj).append(" Configure");
     let defaultIconObj = $("<i></i>", {"class": "fas fa-star fa-fw"});
-    let defaultItemObj = $("<div></div>", {"class": "menuButton bright default"}).html(defaultIconObj).append(" Default");
+    let buttonClass = "";
+    if (gameVersionId == defaultVersion[selectedGame]) buttonClass = "active";
+    let defaultItemObj = $("<div></div>", {"class": `menuButton default ${buttonClass}`}).html(defaultIconObj).append(" Default");
     let removeIconObj = $("<i></i>", {"class": "fas fa-trash fa-fw"});
     let removeItemObj = $("<div></div>", {"class": "menuButton bright-red remove"}).html(removeIconObj).append(" Remove");
     wrapperObj = $("<div></div>", {"class": "game-info-wrapper", "id": i, "data-version": gameVersionId})
@@ -708,7 +720,6 @@ function drawGames() {
 
 function getInstalledGames() {
   installed = {};
-  defaultVersion = {};
   let rawData = "";
   let scummvm = spawn('scummvm.exe', ['--list-targets'], {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
 
@@ -747,16 +758,33 @@ function getInstalledGames() {
             if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";
             installed[testId] = {"name": longName, "versions": []};
             installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
-            defaultVersion[testId] = rawGameId;
           }
         } else {
           numPieces--;
         }
       }
     }
+    updateDefaultVersions();
     drawCategories();
     drawGames();
   });
+}
+
+function updateDefaultVersions() {
+  Object.keys(installed).forEach(key => {
+    if (defaultVersion.hasOwnProperty(key)) {
+      let foundVersion = false;
+      for (v=0; v<installed[key]['versions'].length; v++) {
+        if (installed[key]['versions'][v]['versionShortName'] == defaultVersion[key]) foundVersion = true;
+      }
+      console.log(`${key}: ${foundVersion}`);
+      if (! foundVersion) defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
+    } else {
+      defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
+    }
+  });
+  console.log(defaultVersion);
+  store.set('defaultVersion', defaultVersion);
 }
 
 function getScummvmConfigPath() {
@@ -915,7 +943,6 @@ function getAudioDevices() {
 
 function removeGame(configName) {
   delete scummvmConfig[configName];
-  console.log(scummvmConfig);
   fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
   getInstalledGames();
   drawGames();
