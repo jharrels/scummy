@@ -441,6 +441,7 @@ Scrollbars
 
 #context-menu > .play,
 #context-menu > .launch-items > .play {
+  white-space: nowrap;
   color: #0c0;
   transition: all .25s;
   margin-bottom: 5px;

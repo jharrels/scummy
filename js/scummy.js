@@ -42,8 +42,10 @@ var defaultVersion = store.get('defaultVersion');
 if (defaultVersion === undefined) defaultVersion = {};
 var selectedCategory = store.get('selectedCategory');
 if (selectedCategory === undefined) selectedCategory = "all";
-
-console.log(defaultVersion);
+var recentList = store.get('recentList');
+if (recentList === undefined) recentList = [];
+var maxRecent = store.get('maxRecent');
+if (maxRecent === undefined) maxRecent = 10;
 
 $(`#${listMode}-view`).addClass("active");
 
@@ -187,6 +189,12 @@ $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   let version = defaultVersion[gameId];
   launchGame(gameId, version);
+  let lastPosition = recentList.indexOf(gameId);
+  if (lastPosition > -1) recentList.splice(lastPosition, 1);
+  recentList.unshift(gameId);
+  recentList.splice(maxRecent);
+  store.set('recentList', recentList);
+  if (selectedCategory == "recent") drawGames();
 });
 
 $("#context-menu").on("click", ".manage", function(e) {
@@ -686,6 +694,13 @@ function drawGames() {
   $("#grid").remove();
   $("#list").remove();
   let longNames = {};
+  if (selectedCategory == "recent") {
+    recentList.forEach(key => {
+      if (installed.hasOwnProperty(key)) {
+        longNames[installed[key]['name']] = key;
+      }
+    });
+  }
   if (selectedCategory == "all") {
     Object.keys(installed).forEach(key => {
       longNames[installed[key]['name']] = key;
@@ -701,10 +716,12 @@ function drawGames() {
       if (selectedCategory == gameData[key]['category']) longNames[installed[key]['name']] = key;
     });
   }
+  let tempGameList = Object.keys(longNames);
+  if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
   if (listMode == "gallery") {
     let grid = $("<div></div>", {"id": "grid"});
     $(".main").html("").append(grid);
-    Object.keys(longNames).sort().forEach(key => {
+    tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
       let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
       try {
@@ -725,7 +742,7 @@ function drawGames() {
   if (listMode == "list") {
     let list = $("<div></div>", {"id": "list"});
     $(".main").html("").append(list);
-    Object.keys(longNames).sort().forEach(key => {
+    tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
       let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
       try {
@@ -802,13 +819,11 @@ function updateDefaultVersions() {
       for (v=0; v<installed[key]['versions'].length; v++) {
         if (installed[key]['versions'][v]['versionShortName'] == defaultVersion[key]) foundVersion = true;
       }
-      console.log(`${key}: ${foundVersion}`);
       if (! foundVersion) defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
     } else {
       defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
     }
   });
-  console.log(defaultVersion);
   store.set('defaultVersion', defaultVersion);
 }
 
