@@ -40,8 +40,12 @@ var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
 var defaultVersion = store.get('defaultVersion');
 if (defaultVersion === undefined) defaultVersion = {};
-
-console.log(defaultVersion);
+var selectedCategory = store.get('selectedCategory');
+if (selectedCategory === undefined) selectedCategory = "all";
+var recentList = store.get('recentList');
+if (recentList === undefined) recentList = [];
+var maxRecent = store.get('maxRecent');
+if (maxRecent === undefined) maxRecent = 10;
 
 $(`#${listMode}-view`).addClass("active");
 
@@ -132,6 +136,7 @@ $(".game-info-boxart").on("click", ".game-info-favorite", function(e) {
     $(this).removeClass("active").html(favoriteTextObj).append(" Favorite");
     favorites.splice(favorites.indexOf(selectedGame),1);
     $(`#${selectedGame}`).find("span").find("i").remove();
+    if (selectedCategory == "favorites") $(`#${selectedGame}`).remove();
   } else {
     let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
     $(this).addClass("active").html(favoriteTextObj).append(" Unfavorite");
@@ -172,10 +177,24 @@ $(".main").on("mouseenter", () => {
   $(".main").removeClass("hasScrollBar");
 });
 
+$(".sideBar").on("click", ".sideBarItem", function(e) {
+  $(".sideBarItem").removeClass("selected");
+  $(this).addClass("selected");
+  selectedCategory = $(this).attr("id").split("-")[1];
+  store.set('selectedCategory', selectedCategory);
+  drawGames();
+});
+
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   let version = defaultVersion[gameId];
   launchGame(gameId, version);
+  let lastPosition = recentList.indexOf(gameId);
+  if (lastPosition > -1) recentList.splice(lastPosition, 1);
+  recentList.unshift(gameId);
+  recentList.splice(maxRecent);
+  store.set('recentList', recentList);
+  if (selectedCategory == "recent") drawGames();
 });
 
 $("#context-menu").on("click", ".manage", function(e) {
@@ -195,6 +214,7 @@ $("#context-menu").on("click", ".favorite", function(e) {
     $(this).removeClass("active").html(favoriteTextObj).append(" Favorite");
     favorites.splice(favorites.indexOf(selectedGame),1);
     $(`#${selectedGame}`).find("span").find("i").remove();
+    if (selectedCategory == "favorites") $(`#${selectedGame}`).remove();
   } else {
     let favoriteTextObj = $("<i></i>", {"class": "fas fa-heart-broken"});
     $(this).addClass("active").html(favoriteTextObj).append(" Favorite");
@@ -613,10 +633,11 @@ function drawCategories() {
     if (installedCategories[key] > 0) {
       let tmpIcon = $("<i></i>", {"class": "fas fa-bookmark fa-fw bookmark"});
       let tmpCount = $("<span></span>", {"class":"badge"}).text(installedCategories[key]);
-      let tmpObject = $("<div></div>", {"class":"sideBarItem", "id":key}).text(categories[key]).prepend(tmpIcon).append(tmpCount);
+      let tmpObject = $("<div></div>", {"class":"sideBarItem", "id": `category-${key}`}).text(categories[key]).prepend(tmpIcon).append(tmpCount);
       $("#sideBarCategories").append(tmpObject);
     }
   });
+  $(`#category-${selectedCategory}`).addClass("selected");
 }
 
 function drawGameInfo(gameId) {
@@ -673,13 +694,34 @@ function drawGames() {
   $("#grid").remove();
   $("#list").remove();
   let longNames = {};
-  Object.keys(installed).forEach(key => {
-    longNames[installed[key]['name']] = key;
-  });
+  if (selectedCategory == "recent") {
+    recentList.forEach(key => {
+      if (installed.hasOwnProperty(key)) {
+        longNames[installed[key]['name']] = key;
+      }
+    });
+  }
+  if (selectedCategory == "all") {
+    Object.keys(installed).forEach(key => {
+      longNames[installed[key]['name']] = key;
+    });
+  }
+  if (selectedCategory == "favorites") {
+    favorites.forEach(key => {
+      longNames[installed[key]['name']] = key;
+    });
+  }
+  if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
+    Object.keys(installed).forEach(key => {
+      if (selectedCategory == gameData[key]['category']) longNames[installed[key]['name']] = key;
+    });
+  }
+  let tempGameList = Object.keys(longNames);
+  if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
   if (listMode == "gallery") {
     let grid = $("<div></div>", {"id": "grid"});
     $(".main").html("").append(grid);
-    Object.keys(longNames).sort().forEach(key => {
+    tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
       let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
       try {
@@ -700,7 +742,7 @@ function drawGames() {
   if (listMode == "list") {
     let list = $("<div></div>", {"id": "list"});
     $(".main").html("").append(list);
-    Object.keys(longNames).sort().forEach(key => {
+    tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
       let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
       try {
@@ -777,13 +819,11 @@ function updateDefaultVersions() {
       for (v=0; v<installed[key]['versions'].length; v++) {
         if (installed[key]['versions'][v]['versionShortName'] == defaultVersion[key]) foundVersion = true;
       }
-      console.log(`${key}: ${foundVersion}`);
       if (! foundVersion) defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
     } else {
       defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
     }
   });
-  console.log(defaultVersion);
   store.set('defaultVersion', defaultVersion);
 }
 
