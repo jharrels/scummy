@@ -13,9 +13,9 @@ const Store = require('electron-store');
 const store = new Store();
 const customTitlebar = require('custom-electron-titlebar');
 
-var devMode = true;
 var scummvmConfigPath = "";
 var scummvmConfig = {};
+var scummyConfig = {};
 var tempConfig = {};
 var installed;
 var selectedGame = "";
@@ -44,11 +44,13 @@ var selectedCategory = store.get('selectedCategory');
 if (selectedCategory === undefined) selectedCategory = "all";
 var recentList = store.get('recentList');
 if (recentList === undefined) recentList = [];
-var maxRecent = store.get('maxRecent');
-if (maxRecent === undefined) maxRecent = 10;
+var scummyConfig = store.get('scummyConfig');
+if (scummyConfig === undefined) scummyConfig = {};
 
 $(`#${listMode}-view`).addClass("active");
 
+parseScummyConfig();
+checkInitState();
 getScummvmConfigPath();
 loadScummvmConfig();
 getInstalledGames();
@@ -185,16 +187,25 @@ $(".sideBar").on("click", ".sideBarItem", function(e) {
   drawGames();
 });
 
+$("#scummy-configure").on("click", function() {
+  showModal("#scummy-configure-modal");
+  $("#scummvm-executable-path").html(scummyConfig['scummvmPath']);
+  $("#gui-show-title").prop("checked", scummyConfig['showTitles']);
+  $("#gui-show-favorite-icon").prop("checked", scummyConfig['showFavoriteIcon']);
+  $("#gui-show-categories").prop("checked", scummyConfig['showCategories']);
+  $("#gui-show-recents").prop("checked", scummyConfig['showRecentCategory']);
+  $("#gui-max-recents").val(scummyConfig['recentMax']);
+  $("#gui-max-recents-text").html(scummyConfig['recentMax']);
+});
+
+$("#gui-max-recents").on("input", function() {
+  $("#gui-max-recents-text").html($("#gui-max-recents").val());
+});
+
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   let version = defaultVersion[gameId];
   launchGame(gameId, version);
-  let lastPosition = recentList.indexOf(gameId);
-  if (lastPosition > -1) recentList.splice(lastPosition, 1);
-  recentList.unshift(gameId);
-  recentList.splice(maxRecent);
-  store.set('recentList', recentList);
-  if (selectedCategory == "recent") drawGames();
 });
 
 $("#context-menu").on("click", ".manage", function(e) {
@@ -351,6 +362,16 @@ $("#game-configure-modal-cancel").on("click", () => {
   $("#game-configure-modal").fadeOut(250);
 });
 
+$("#scummy-configure-modal-cancel").on("click", () => {
+  $("#scummy-configure-modal").fadeOut(250);
+});
+
+$("#scummy-configure-modal-save").on("click", () => {
+  saveScummyConfig();
+  $("#scummy-configure-modal").fadeOut(250);
+});
+
+
 $("#game-configure-modal-save").on("click", () => {
   let shortName = selectedConfig;
   enableDisableGraphicsOptions(shortName);
@@ -465,6 +486,12 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
+  let lastPosition = recentList.indexOf(gameId);
+  if (lastPosition > -1) recentList.splice(lastPosition, 1);
+  recentList.unshift(gameId);
+  recentList.splice(scummyConfig['recentMax']);
+  store.set('recentList', recentList);
+  if (selectedCategory == "recent") drawGames();
   let launchOptions = [];
   let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
   let tempConfigPath = writeTempConfig(shortName);
@@ -619,6 +646,7 @@ function drawGameConfig() {
 }
 
 function drawCategories() {
+  if (!scummyConfig['showRecentCategory']) $("#category-recent").hide();
   $("#sideBarCategories").html("");
   $("#all").html(Object.keys(installed).length);
   $("#favorites").html(favorites.length);
@@ -638,6 +666,10 @@ function drawCategories() {
     }
   });
   $(`#category-${selectedCategory}`).addClass("selected");
+  if (!scummyConfig['showCategories']) {
+    $("#sideBarCategories").hide();
+    if (selectedCategory != "category-all") $("#category-all").click()
+  }
 }
 
 function drawGameInfo(gameId) {
@@ -732,8 +764,11 @@ function drawGames() {
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let favoriteObj = "";
-      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
-      let gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
+      if (scummyConfig['showFavoriteIcon']) {
+        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      }
+      let gameNameObj;
+      if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
@@ -752,7 +787,9 @@ function drawGames() {
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let favoriteObj = "";
-      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      if (scummyConfig['showFavoriteIcon']) {
+        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      }
       let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
       $("#list").append(rowObj);
@@ -987,6 +1024,37 @@ function removeGame(configName) {
   getInstalledGames();
   drawGames();
   $("#game-info-close").trigger("click");
+}
+
+function parseScummyConfig() {
+  if (!scummyConfig.hasOwnProperty("showTitles")) scummyConfig['showTitles'] = true;
+  if (!scummyConfig.hasOwnProperty("showFavoriteIcon")) scummyConfig['showFavoriteIcon'] = true;
+  if (!scummyConfig.hasOwnProperty("showCategories")) scummyConfig['showCategories'] = true;
+  if (!scummyConfig.hasOwnProperty("showRecentCategory")) scummyConfig['showRecentCategory'] = true;
+  if (!scummyConfig.hasOwnProperty("recentMax")) scummyConfig['recentMax'] = 10;
+  if (!scummyConfig.hasOwnProperty("scummvmPath")) scummyConfig['scummvmPath'] = "";
+}
+
+function saveScummyConfig() {
+  scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
+  scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
+  scummyConfig["showCategories"] = $("#gui-show-categories").prop("checked");
+  scummyConfig["showRecentCategory"] = $("#gui-show-recents").prop("checked");
+  scummyConfig["recentMax"] = $("#gui-max-recents").val();
+  store.set('scummyConfig', scummyConfig);
+  if (scummyConfig["showCategories"]) {
+    $("#sideBarCategories").fadeIn(250);
+  } else {
+    if ((selectedCategory != "category-favorites") && (selectedCategory != "category-all") && (selectedCategory != "category-recent")) $("#category-all").trigger("click");
+    $("#sideBarCategories").fadeOut(250);
+  }
+  if (scummyConfig["showRecentCategory"]) {
+    $("#category-recent").fadeIn(250);
+  } else {
+    if (selectedCategory != "category-recent") $("#category-all").trigger("click");
+    $("#category-recent").fadeOut(250);
+  }
+  drawGames();
 }
 
 function showModal(modalId) {

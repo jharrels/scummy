@@ -23,6 +23,9 @@
         CATEGORIES
       </div>
     </div>
+    <div class="menuButton bright" id="scummy-configure">
+      <i class="fas fa-cog fa-fw"></i>
+    </div>
   </div>
   <div class="leftMenuBar">
     <div class="menuButton" id="add-game">
@@ -137,6 +140,75 @@
       </div>
       <div class="modal-footer">
         <div id="game-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="game-configure-modal-save" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-configure-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          General
+        </div>
+        <div class="modal-option">
+          SCUMMVM Executable
+          <table>
+            <tr>
+              <td><span id="scummvm-executable-path"></span></td><td>&nbsp;<i class="fas fa-folder-open"></i></td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-favorite-icon"> Display favorite icon on titles
+        </div>
+        <hr>
+        <div class="modal-option-category engine-options-header">
+          Gallery View
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-title"> Display title under box art
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Side Bar
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-categories"> Show pre-made categories
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-recents"> Show recently played games
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Recents
+        </div>
+        <div class="modal-option">
+          <table>
+            <tr><td>Recently played games to remember</td><td><input type="range" min="5" max="30" id="gui-max-recents"><span id="gui-max-recents-text"></span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="scummy-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="scummy-configure-modal-save" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-1">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          SCUMMVM Executable
+        </div>
+        <div class="modal-option">
+          In order to integrate with SCUMMVM, you will need to specify the location of the SCUMMVM executable. Please click on the icon below, which will open a dialog. In the window that opens, locate SCUMMVM.exe and select it.
+          <table>
+            <tr>
+              <td><span id="scummvm-executable-path"></span></td><td>&nbsp;<i class="fas fa-folder-open"></i></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="scummy-configure-modal-cancel" class="modal-button bright"><i class="fas fa-chevron-left"></i> Previous</div><div id="scummy-configure-modal-save" class="modal-button bright">Next <i class="fas fa-chevron-right"></i></div>
       </div>
     </div>
   </div>
