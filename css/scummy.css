@@ -699,6 +699,10 @@ Dialog
   padding: 20px 30px;
 }
 
+.no-float {
+  float: none !important;
+}
+
 .modal-button {
   float: right;
   width: 60px;
@@ -740,6 +744,12 @@ Dialog
 .modal-button.bright:active {
   background-color: white;
   color: rgba(27, 39, 45);
+}
+
+.modal-secondary {
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #BBE1FA;
 }
 
 .modal-option-category {

@@ -13,7 +13,6 @@ const Store = require('electron-store');
 const store = new Store();
 const customTitlebar = require('custom-electron-titlebar');
 
-var scummvmConfigPath = "";
 var scummvmConfig = {};
 var scummyConfig = {};
 var tempConfig = {};
@@ -51,14 +50,76 @@ $(`#${listMode}-view`).addClass("active");
 
 parseScummyConfig();
 checkInitState();
-getScummvmConfigPath();
-loadScummvmConfig();
-getInstalledGames();
-getAudioDevices();
 
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
+
+$("#init-next-1").on("click", () => {
+  hideModal("#scummy-init-modal-1");
+  showModal("#scummy-init-modal-2");
+});
+
+$("#init-back-2").on("click", () => {
+  hideModal("#scummy-init-modal-2");
+  showModal("#scummy-init-modal-1");
+});
+
+$("#init-back-3").on("click", () => {
+  hideModal("#scummy-init-modal-3");
+  showModal("#scummy-init-modal-2");
+});
+
+$("#init-next-2").on("click", () => {
+  hideModal("#scummy-init-modal-2");
+  showModal("#scummy-init-modal-3");
+  let tempPath = getScummvmConfigPath();
+  $("#init-scummvm-config-path").html(tempPath);
+});
+
+$("#init-next-3").on("click", () => {
+  hideModal("#scummy-init-modal-3");
+  scummyConfig['scummvmConfigPath'] = $("#init-scummvm-config-path").text();
+  scummyConfig['scummvmPath'] = $("#init-scummvm-executable-path").text();
+  loadScummvmConfig();
+  getInstalledGames();
+  getAudioDevices();
+  $(".sideBar").fadeIn(500, function() {
+    $(".leftMenuBar").fadeIn(500);
+    $(".rightMenuBar").fadeIn(500, function() {
+      $(".main").fadeIn(500);
+    });
+  });
+});
+
+$("#init-scummvm-path").on("click", () => {
+  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+      "title": "Locate the ScummVM executable",
+      "message": "Locate the ScummVM executable.",
+      "properties": [
+        'openFile'
+      ]
+  })
+  if (tempPath) {
+    $("#init-next-2").removeClass("disabled-option");
+    $("#init-scummvm-executable-path").html(tempPath);
+  }
+});
+
+$("#init-choose-scummvm-config-path").on("click", () => {
+  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+      "title": "Locate the ScummVM Configuration File",
+      "message": "Locate the ScummVM Configuration File.",
+      "properties": [
+        'openFile'
+      ]
+  })
+  if (tempPath) {
+    $("#init-next-3").removeClass("disabled-option");
+    $("#init-scummvm-config-path").html(tempPath);
+  }
+});
+
 $("#add-game").on("click", () => {
   let addPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
       "title": "Add Game",
@@ -378,7 +439,7 @@ $("#game-configure-modal-save").on("click", () => {
   enableDisableAudioOptions(shortName);
   enableDisableVolumeOptions(shortName);
   scummvmConfig = JSON.parse(JSON.stringify(tempConfig));
-  fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
+  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
   $("#game-configure-modal").fadeOut(250);
 });
 
@@ -498,7 +559,9 @@ function launchGame(gameId, shortName) {
   launchOptions.push(`--config="${tempConfigPath}"`);
   launchOptions.push(gameId);
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   showWaiting(installed[gameId]['name']);
   scummvm.stdout.on('data', (data) => {
   });
@@ -800,7 +863,9 @@ function drawGames() {
 function getInstalledGames() {
   installed = {};
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', ['--list-targets'], {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, ['--list-targets'], {'cwd': scummvmPath, 'shell': true});
 
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -865,12 +930,14 @@ function updateDefaultVersions() {
 }
 
 function getScummvmConfigPath() {
+  let scummvmConfigPath = "";
   if (os.type() == 'Windows_NT') scummvmConfigPath = process.env.APPDATA+"\\ScummVM\\scummvm.ini";
   if (os.type() == 'Darwin') scummvmConfigPath = process.env.HOME+"/Library/Preferences/ScummVM Preferences";
+  return scummvmConfigPath;
 }
 
 function loadScummvmConfig() {
-  let rawScummvmConfig = fs.readFileSync(scummvmConfigPath, 'utf-8');
+  let rawScummvmConfig = fs.readFileSync(scummyConfig['scummvmConfigPath'], 'utf-8');
   scummvmConfig = ini.parse(rawScummvmConfig);
 }
 
@@ -911,7 +978,9 @@ function detectGame(gamePath) {
   importGamePath = gamePath;
   let launchOptions = ['--detect', `--path="${gamePath}"`];
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
   });
@@ -978,7 +1047,9 @@ function detectGame(gamePath) {
 function importGame(gamePath) {
   let launchOptions = ['--add', `--path="${gamePath}"`];
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
   });
@@ -997,7 +1068,9 @@ function getAudioDevices() {
   audioDevices = [];
   let launchOptions = ['--list-audio-devices'];
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
   });
@@ -1020,7 +1093,7 @@ function getAudioDevices() {
 
 function removeGame(configName) {
   delete scummvmConfig[configName];
-  fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
+  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
   getInstalledGames();
   drawGames();
   $("#game-info-close").trigger("click");
@@ -1033,6 +1106,7 @@ function parseScummyConfig() {
   if (!scummyConfig.hasOwnProperty("showRecentCategory")) scummyConfig['showRecentCategory'] = true;
   if (!scummyConfig.hasOwnProperty("recentMax")) scummyConfig['recentMax'] = 10;
   if (!scummyConfig.hasOwnProperty("scummvmPath")) scummyConfig['scummvmPath'] = "";
+  if (!scummyConfig.hasOwnProperty("scummvmConfigPath")) scummyConfig['scummvmConfigPath'] = "";
 }
 
 function saveScummyConfig() {
@@ -1055,6 +1129,24 @@ function saveScummyConfig() {
     $("#category-recent").fadeOut(250);
   }
   drawGames();
+}
+
+function showScummySetup() {
+  showModal("#scummy-init-modal-1");
+}
+
+function checkInitState() {
+  if (scummyConfig['scummvmPath'] == "") {
+    $(".sideBar").hide();
+    $(".main").hide();
+    $(".leftMenuBar").hide();
+    $(".rightMenuBar").hide();
+    showScummySetup();
+  } else {
+    loadScummvmConfig();
+    getInstalledGames();
+    getAudioDevices();
+  }
 }
 
 function showModal(modalId) {

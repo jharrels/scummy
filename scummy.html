@@ -196,19 +196,50 @@
     <div class="modal-wrapper">
       <div class="modal-body">
         <div class="modal-option-category graphics-options-header">
-          SCUMMVM Executable
+          Welcome!
         </div>
         <div class="modal-option">
-          In order to integrate with SCUMMVM, you will need to specify the location of the SCUMMVM executable. Please click on the icon below, which will open a dialog. In the window that opens, locate SCUMMVM.exe and select it.
-          <table>
-            <tr>
-              <td><span id="scummvm-executable-path"></span></td><td>&nbsp;<i class="fas fa-folder-open"></i></td>
-            </tr>
-          </table>
+          Welcome to Scummy, a front-end for SCUMMVM.<br><br>Before using Scummy, you'll need to configure a couple of options.
         </div>
       </div>
       <div class="modal-footer">
-        <div id="scummy-configure-modal-cancel" class="modal-button bright"><i class="fas fa-chevron-left"></i> Previous</div><div id="scummy-configure-modal-save" class="modal-button bright">Next <i class="fas fa-chevron-right"></i></div>
+        <div id="init-next-1" class="modal-button bright">Start</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-2">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Step 1 of 2: SCUMMVM Executable
+        </div>
+        <div class="modal-option">
+          In order to integrate with SCUMMVM, you will need to specify the location of the SCUMMVM executable.<br><br>Please click on the button below, which will open a dialog. In the window that opens, locate SCUMMVM.exe and select it.<br><br>
+          Executable Location:<br>
+          <span class="modal-secondary" id="init-scummvm-executable-path"></span><br><br>
+          <div class="modal-button dark no-float" id="init-scummvm-path">Choose...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-2" class="disabled-option modal-button bright">Next <i class="fas fa-chevron-right"></i></div><div id="init-back-2" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-3">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Step 2 of 2: SCUMMVM Configuration File
+        </div>
+        <div class="modal-option">
+          Scummy detected a ScummVM configuration in the location below.<br><br>If you'd like to use a different configuration file, click the folder button.<br><br>
+          Configuration File Location:<br>
+          <span class="modal-secondary" id="init-scummvm-config-path"></span><br><br>
+          <div class="modal-button dark no-float" id="init-choose-scummvm-config-path">Choose...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-3" class="modal-button bright">Finish</i></div><div id="init-back-3" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
       </div>
     </div>
   </div>
