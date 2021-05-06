@@ -119,9 +119,9 @@ Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few ex
 * **0.6.0** - ~~Remove installed games.~~ :heavy_check_mark:
 * **0.7.0** - ~~Favoriting of games.~~ :heavy_check_mark:
 * **0.8.0** - ~~Set default games.~~ :heavy_check_mark:
-* **0.9.0** - ~~Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).~~
-* 0.10.0 - GUI configuration options for Scummy.
-* 0.11.0 - Add any remaining missing box art.
+* **0.9.0** - ~~Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).~~ :heavy_check_mark:
+* **0.10.0** - ~~GUI configuration options for Scummy.~~ :heavy_check_mark:
+* 0.11.0 - Get automated builds working.
 * 1.0.0 - Release.
 
 Planned features:

@@ -23,6 +23,9 @@
         CATEGORIES
       </div>
     </div>
+    <div class="menuButton bright" id="scummy-configure">
+      <i class="fas fa-cog fa-fw"></i>
+    </div>
   </div>
   <div class="leftMenuBar">
     <div class="menuButton" id="add-game">
@@ -137,6 +140,107 @@
       </div>
       <div class="modal-footer">
         <div id="game-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="game-configure-modal-save" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-configure-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          General
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-favorite-icon"> Display favorite icon on titles
+        </div>
+        <hr>
+        <div class="modal-option-category engine-options-header">
+          Gallery View
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-title"> Display title under box art
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Side Bar
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-categories"> Show pre-made categories
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-recents"> Show recently played games
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Recents
+        </div>
+        <div class="modal-option">
+          <table>
+            <tr><td>Recently played games to remember</td><td><input type="range" min="5" max="30" id="gui-max-recents"><span id="gui-max-recents-text"></span></td></tr>
+          </table>
+        </div>
+      </div>
+      <hr>
+      <div class="modal-option-category graphics-options-header">
+        SCUMMVM Integration
+      </div>
+      <div class="modal-option">
+        SCUMMVM Executable:<br>
+        <span class="modal-secondary" id="scummvm-executable-path"></span>
+      </div>
+
+      <div class="modal-footer">
+        <div id="scummy-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="scummy-configure-modal-save" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-1">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Welcome!
+        </div>
+        <div class="modal-option">
+          Welcome to Scummy, a front-end for SCUMMVM.<br><br>Before using Scummy, you'll need to configure a couple of options.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-1" class="modal-button bright">Start</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-2">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Step 1 of 2: SCUMMVM Executable
+        </div>
+        <div class="modal-option">
+          In order to integrate with SCUMMVM, you will need to specify the location of the SCUMMVM executable.<br><br>Please click on the button below, which will open a dialog. In the window that opens, locate SCUMMVM.exe and select it.<br><br>
+          Executable Location:<br>
+          <span class="modal-secondary" id="init-scummvm-executable-path"></span><br><br>
+          <div class="modal-button dark no-float" id="init-scummvm-path">Choose...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-2" class="disabled-option modal-button bright">Next <i class="fas fa-chevron-right"></i></div><div id="init-back-2" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-3">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Step 2 of 2: SCUMMVM Configuration File
+        </div>
+        <div class="modal-option">
+          Scummy detected a ScummVM configuration in the location below.<br><br>If you'd like to use a different configuration file, click the folder button.<br><br>
+          Configuration File Location:<br>
+          <span class="modal-secondary" id="init-scummvm-config-path"></span><br><br>
+          <div class="modal-button dark no-float" id="init-choose-scummvm-config-path">Choose...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-3" class="modal-button bright">Finish</i></div><div id="init-back-3" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
       </div>
     </div>
   </div>

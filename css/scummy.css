@@ -85,6 +85,13 @@ html {
   margin-top: 30px;
 }
 
+#scummy-configure {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  display: inline-block;
+}
+
 .rightMenuBar {
   position: absolute;
   display: inline-block;
@@ -624,6 +631,14 @@ Dialog
   display: none;
 }
 
+.modal-body > hr {
+  margin-top: 30px;
+  margin-left: 10px;
+  opacity: 0.2;
+  border-top: 1px solid white;
+  border-bottom: none;
+}
+
 .modal > .modal-wrapper {
   padding: 0px 0px;
   position: absolute;
@@ -684,6 +699,10 @@ Dialog
   padding: 20px 30px;
 }
 
+.no-float {
+  float: none !important;
+}
+
 .modal-button {
   float: right;
   width: 60px;
@@ -725,6 +744,12 @@ Dialog
 .modal-button.bright:active {
   background-color: white;
   color: rgba(27, 39, 45);
+}
+
+.modal-secondary {
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #BBE1FA;
 }
 
 .modal-option-category {

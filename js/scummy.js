@@ -13,9 +13,8 @@ const Store = require('electron-store');
 const store = new Store();
 const customTitlebar = require('custom-electron-titlebar');
 
-var devMode = true;
-var scummvmConfigPath = "";
 var scummvmConfig = {};
+var scummyConfig = {};
 var tempConfig = {};
 var installed;
 var selectedGame = "";
@@ -44,19 +43,84 @@ var selectedCategory = store.get('selectedCategory');
 if (selectedCategory === undefined) selectedCategory = "all";
 var recentList = store.get('recentList');
 if (recentList === undefined) recentList = [];
-var maxRecent = store.get('maxRecent');
-if (maxRecent === undefined) maxRecent = 10;
+var scummyConfig = store.get('scummyConfig');
+if (scummyConfig === undefined) scummyConfig = {};
 
 $(`#${listMode}-view`).addClass("active");
 
-getScummvmConfigPath();
-loadScummvmConfig();
-getInstalledGames();
-getAudioDevices();
+parseScummyConfig();
+checkInitState();
 
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
+
+$("#init-next-1").on("click", () => {
+  hideModal("#scummy-init-modal-1");
+  showModal("#scummy-init-modal-2");
+});
+
+$("#init-back-2").on("click", () => {
+  hideModal("#scummy-init-modal-2");
+  showModal("#scummy-init-modal-1");
+});
+
+$("#init-back-3").on("click", () => {
+  hideModal("#scummy-init-modal-3");
+  showModal("#scummy-init-modal-2");
+});
+
+$("#init-next-2").on("click", () => {
+  hideModal("#scummy-init-modal-2");
+  showModal("#scummy-init-modal-3");
+  let tempPath = getScummvmConfigPath();
+  $("#init-scummvm-config-path").html(tempPath);
+});
+
+$("#init-next-3").on("click", () => {
+  hideModal("#scummy-init-modal-3");
+  scummyConfig['scummvmConfigPath'] = $("#init-scummvm-config-path").text();
+  scummyConfig['scummvmPath'] = $("#init-scummvm-executable-path").text();
+  store.set('scummyConfig', scummyConfig);
+  loadScummvmConfig();
+  getInstalledGames();
+  getAudioDevices();
+  $(".sideBar").fadeIn(500, function() {
+    $(".leftMenuBar").fadeIn(500);
+    $(".rightMenuBar").fadeIn(500, function() {
+      $(".main").fadeIn(500);
+    });
+  });
+});
+
+$("#init-scummvm-path").on("click", () => {
+  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+      "title": "Locate the ScummVM executable",
+      "message": "Locate the ScummVM executable.",
+      "properties": [
+        'openFile'
+      ]
+  })
+  if (tempPath) {
+    $("#init-next-2").removeClass("disabled-option");
+    $("#init-scummvm-executable-path").html(tempPath);
+  }
+});
+
+$("#init-choose-scummvm-config-path").on("click", () => {
+  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+      "title": "Locate the ScummVM Configuration File",
+      "message": "Locate the ScummVM Configuration File.",
+      "properties": [
+        'openFile'
+      ]
+  })
+  if (tempPath) {
+    $("#init-next-3").removeClass("disabled-option");
+    $("#init-scummvm-config-path").html(tempPath);
+  }
+});
+
 $("#add-game").on("click", () => {
   let addPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
       "title": "Add Game",
@@ -185,16 +249,25 @@ $(".sideBar").on("click", ".sideBarItem", function(e) {
   drawGames();
 });
 
+$("#scummy-configure").on("click", function() {
+  showModal("#scummy-configure-modal");
+  $("#scummvm-executable-path").html(scummyConfig['scummvmPath']);
+  $("#gui-show-title").prop("checked", scummyConfig['showTitles']);
+  $("#gui-show-favorite-icon").prop("checked", scummyConfig['showFavoriteIcon']);
+  $("#gui-show-categories").prop("checked", scummyConfig['showCategories']);
+  $("#gui-show-recents").prop("checked", scummyConfig['showRecentCategory']);
+  $("#gui-max-recents").val(scummyConfig['recentMax']);
+  $("#gui-max-recents-text").html(scummyConfig['recentMax']);
+});
+
+$("#gui-max-recents").on("input", function() {
+  $("#gui-max-recents-text").html($("#gui-max-recents").val());
+});
+
 $(".main").on("click", ".game", function(e) {
   let gameId = $(this).attr("id");
   let version = defaultVersion[gameId];
   launchGame(gameId, version);
-  let lastPosition = recentList.indexOf(gameId);
-  if (lastPosition > -1) recentList.splice(lastPosition, 1);
-  recentList.unshift(gameId);
-  recentList.splice(maxRecent);
-  store.set('recentList', recentList);
-  if (selectedCategory == "recent") drawGames();
 });
 
 $("#context-menu").on("click", ".manage", function(e) {
@@ -351,13 +424,23 @@ $("#game-configure-modal-cancel").on("click", () => {
   $("#game-configure-modal").fadeOut(250);
 });
 
+$("#scummy-configure-modal-cancel").on("click", () => {
+  $("#scummy-configure-modal").fadeOut(250);
+});
+
+$("#scummy-configure-modal-save").on("click", () => {
+  saveScummyConfig();
+  $("#scummy-configure-modal").fadeOut(250);
+});
+
+
 $("#game-configure-modal-save").on("click", () => {
   let shortName = selectedConfig;
   enableDisableGraphicsOptions(shortName);
   enableDisableAudioOptions(shortName);
   enableDisableVolumeOptions(shortName);
   scummvmConfig = JSON.parse(JSON.stringify(tempConfig));
-  fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
+  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
   $("#game-configure-modal").fadeOut(250);
 });
 
@@ -465,13 +548,21 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
+  let lastPosition = recentList.indexOf(gameId);
+  if (lastPosition > -1) recentList.splice(lastPosition, 1);
+  recentList.unshift(gameId);
+  recentList.splice(scummyConfig['recentMax']);
+  store.set('recentList', recentList);
+  if (selectedCategory == "recent") drawGames();
   let launchOptions = [];
   let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
   let tempConfigPath = writeTempConfig(shortName);
   launchOptions.push(`--config="${tempConfigPath}"`);
   launchOptions.push(gameId);
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   showWaiting(installed[gameId]['name']);
   scummvm.stdout.on('data', (data) => {
   });
@@ -619,6 +710,7 @@ function drawGameConfig() {
 }
 
 function drawCategories() {
+  if (!scummyConfig['showRecentCategory']) $("#category-recent").hide();
   $("#sideBarCategories").html("");
   $("#all").html(Object.keys(installed).length);
   $("#favorites").html(favorites.length);
@@ -638,6 +730,10 @@ function drawCategories() {
     }
   });
   $(`#category-${selectedCategory}`).addClass("selected");
+  if (!scummyConfig['showCategories']) {
+    $("#sideBarCategories").hide();
+    if (selectedCategory != "category-all") $("#category-all").click()
+  }
 }
 
 function drawGameInfo(gameId) {
@@ -732,8 +828,11 @@ function drawGames() {
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let favoriteObj = "";
-      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
-      let gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
+      if (scummyConfig['showFavoriteIcon']) {
+        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      }
+      let gameNameObj;
+      if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
@@ -752,7 +851,9 @@ function drawGames() {
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
       let favoriteObj = "";
-      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      if (scummyConfig['showFavoriteIcon']) {
+        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      }
       let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
       $("#list").append(rowObj);
@@ -763,7 +864,9 @@ function drawGames() {
 function getInstalledGames() {
   installed = {};
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', ['--list-targets'], {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, ['--list-targets'], {'cwd': scummvmPath, 'shell': true});
 
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -828,12 +931,14 @@ function updateDefaultVersions() {
 }
 
 function getScummvmConfigPath() {
+  let scummvmConfigPath = "";
   if (os.type() == 'Windows_NT') scummvmConfigPath = process.env.APPDATA+"\\ScummVM\\scummvm.ini";
   if (os.type() == 'Darwin') scummvmConfigPath = process.env.HOME+"/Library/Preferences/ScummVM Preferences";
+  return scummvmConfigPath;
 }
 
 function loadScummvmConfig() {
-  let rawScummvmConfig = fs.readFileSync(scummvmConfigPath, 'utf-8');
+  let rawScummvmConfig = fs.readFileSync(scummyConfig['scummvmConfigPath'], 'utf-8');
   scummvmConfig = ini.parse(rawScummvmConfig);
 }
 
@@ -874,7 +979,9 @@ function detectGame(gamePath) {
   importGamePath = gamePath;
   let launchOptions = ['--detect', `--path="${gamePath}"`];
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
   });
@@ -941,7 +1048,9 @@ function detectGame(gamePath) {
 function importGame(gamePath) {
   let launchOptions = ['--add', `--path="${gamePath}"`];
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
   });
@@ -960,7 +1069,9 @@ function getAudioDevices() {
   audioDevices = [];
   let launchOptions = ['--list-audio-devices'];
   let rawData = "";
-  let scummvm = spawn('scummvm.exe', launchOptions, {'cwd': 'c:\\Program Files\\scummvm', 'shell': true});
+  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
+  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
   });
@@ -983,10 +1094,60 @@ function getAudioDevices() {
 
 function removeGame(configName) {
   delete scummvmConfig[configName];
-  fs.writeFileSync(scummvmConfigPath, ini.stringify(scummvmConfig));
+  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
   getInstalledGames();
   drawGames();
   $("#game-info-close").trigger("click");
+}
+
+function parseScummyConfig() {
+  if (!scummyConfig.hasOwnProperty("showTitles")) scummyConfig['showTitles'] = true;
+  if (!scummyConfig.hasOwnProperty("showFavoriteIcon")) scummyConfig['showFavoriteIcon'] = true;
+  if (!scummyConfig.hasOwnProperty("showCategories")) scummyConfig['showCategories'] = true;
+  if (!scummyConfig.hasOwnProperty("showRecentCategory")) scummyConfig['showRecentCategory'] = true;
+  if (!scummyConfig.hasOwnProperty("recentMax")) scummyConfig['recentMax'] = 10;
+  if (!scummyConfig.hasOwnProperty("scummvmPath")) scummyConfig['scummvmPath'] = "";
+  if (!scummyConfig.hasOwnProperty("scummvmConfigPath")) scummyConfig['scummvmConfigPath'] = "";
+}
+
+function saveScummyConfig() {
+  scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
+  scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
+  scummyConfig["showCategories"] = $("#gui-show-categories").prop("checked");
+  scummyConfig["showRecentCategory"] = $("#gui-show-recents").prop("checked");
+  scummyConfig["recentMax"] = $("#gui-max-recents").val();
+  store.set('scummyConfig', scummyConfig);
+  if (scummyConfig["showCategories"]) {
+    $("#sideBarCategories").fadeIn(250);
+  } else {
+    if ((selectedCategory != "category-favorites") && (selectedCategory != "category-all") && (selectedCategory != "category-recent")) $("#category-all").trigger("click");
+    $("#sideBarCategories").fadeOut(250);
+  }
+  if (scummyConfig["showRecentCategory"]) {
+    $("#category-recent").fadeIn(250);
+  } else {
+    if (selectedCategory != "category-recent") $("#category-all").trigger("click");
+    $("#category-recent").fadeOut(250);
+  }
+  drawGames();
+}
+
+function showScummySetup() {
+  showModal("#scummy-init-modal-1");
+}
+
+function checkInitState() {
+  if (scummyConfig['scummvmPath'] == "") {
+    $(".sideBar").hide();
+    $(".main").hide();
+    $(".leftMenuBar").hide();
+    $(".rightMenuBar").hide();
+    showScummySetup();
+  } else {
+    loadScummvmConfig();
+    getInstalledGames();
+    getAudioDevices();
+  }
 }
 
 function showModal(modalId) {
