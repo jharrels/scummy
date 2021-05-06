@@ -81,6 +81,7 @@ $("#init-next-3").on("click", () => {
   hideModal("#scummy-init-modal-3");
   scummyConfig['scummvmConfigPath'] = $("#init-scummvm-config-path").text();
   scummyConfig['scummvmPath'] = $("#init-scummvm-executable-path").text();
+  store.set('scummyConfig', scummyConfig);
   loadScummvmConfig();
   getInstalledGames();
   getAudioDevices();
