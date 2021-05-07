@@ -185,9 +185,14 @@
       </div>
       <div class="modal-option">
         SCUMMVM Executable:<br>
-        <span class="modal-secondary" id="scummvm-executable-path"></span>
+        <span class="modal-secondary" id="scummvm-executable-path"></span><br>
+        <div class="modal-button dark no-float" id="change-scummvm-path">Change</div> <span class="config-error" id="scummvm-executable-error">Invalid SCUMMVM executable.</span>
       </div>
-
+      <div class="modal-option">
+        SCUMMVM Configuration File:<br>
+        <span class="modal-secondary" id="scummvm-configuration-path"></span><br>
+        <div class="modal-button dark no-float" id="change-scummvm-config-path">Change</div>  <span class="config-error" id="scummvm-config-error">Invalid SCUMMVM configuration file.</span>
+      </div>
       <div class="modal-footer">
         <div id="scummy-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="scummy-configure-modal-save" class="modal-button bright">Save</div>
       </div>
@@ -218,7 +223,7 @@
           In order to integrate with SCUMMVM, you will need to specify the location of the SCUMMVM executable.<br><br>Please click on the button below, which will open a dialog. In the window that opens, locate SCUMMVM.exe and select it.<br><br>
           Executable Location:<br>
           <span class="modal-secondary" id="init-scummvm-executable-path"></span><br><br>
-          <div class="modal-button dark no-float" id="init-scummvm-path">Choose...</div>
+          <div class="modal-button dark no-float" id="init-scummvm-path">Choose...</div> <span class="config-error" id="init-scummvm-executable-error">Invalid SCUMMVM executable.</span>
         </div>
       </div>
       <div class="modal-footer">
@@ -236,7 +241,7 @@
           Scummy detected a ScummVM configuration in the location below.<br><br>If you'd like to use a different configuration file, click the folder button.<br><br>
           Configuration File Location:<br>
           <span class="modal-secondary" id="init-scummvm-config-path"></span><br><br>
-          <div class="modal-button dark no-float" id="init-choose-scummvm-config-path">Choose...</div>
+          <div class="modal-button dark no-float" id="init-choose-scummvm-config-path">Choose...</div>  <span class="config-error" id="init-scummvm-config-error">Invalid SCUMMVM configuration file.</span>
         </div>
       </div>
       <div class="modal-footer">
