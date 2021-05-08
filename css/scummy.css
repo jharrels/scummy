@@ -805,6 +805,10 @@ Dialog
   pointer-events: none;
 }
 
+.config-error{
+  color: #f00;
+}
+
 .clear {
   clear: both;
 }
