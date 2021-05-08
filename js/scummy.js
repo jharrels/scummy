@@ -74,6 +74,7 @@ $("#init-back-3").on("click", () => {
 $("#init-next-2").on("click", () => {
   hideModal("#scummy-init-modal-2");
   showModal("#scummy-init-modal-3");
+  $("#init-scummvm-config-error").hide();
   let tempPath = getScummvmConfigPath();
   $("#init-scummvm-config-path").html(tempPath);
 });
@@ -105,10 +106,27 @@ $("#change-scummvm-path").on("click", () => {
   })
   if (tempPath) {
     $("#scummvm-executable-path").html(tempPath);
-    if (!verifyScummvmExecutable(tempPath)) {
-      $("#scummy-configure-modal-save").addClass("disabled-option");
-      $("#scummvm-executable-error").fadeIn(250);
-    }
+    let launchOptions = ['--help'];
+    let rawData = "";
+    let scummvmFile = path.basename(tempPath.toString());
+    let scummvmPath = path.dirname(tempPath.toString());
+    let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
+    scummvm.stdout.on('data', (data) => {
+      rawData += data.toString();
+    });
+
+    scummvm.stderr.on('data', (data) => {
+    });
+
+    scummvm.on('exit', (code) => {
+      rawDataList = rawData.split("\r\n");
+      if (rawDataList[0].includes("ScummVM")) {
+        $("#scummy-configure-modal-save").removeClass("disabled-option");
+      } else {
+        $("#scummy-configure-modal-save").addClass("disabled-option");
+        $("#scummvm-executable-error").fadeIn(250);
+      }
+    })
   }
 });
 
@@ -141,11 +159,32 @@ $("#init-scummvm-path").on("click", () => {
   })
   if (tempPath) {
     $("#init-scummvm-executable-path").html(tempPath);
-    $("#init-next-2").removeClass("disabled-option");
+    let launchOptions = ['--help'];
+    let rawData = "";
+    let scummvmFile = path.basename(tempPath.toString());
+    let scummvmPath = path.dirname(tempPath.toString());
+    let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
+    scummvm.stdout.on('data', (data) => {
+      rawData += data.toString();
+    });
+
+    scummvm.stderr.on('data', (data) => {
+    });
+
+    scummvm.on('exit', (code) => {
+      rawDataList = rawData.split("\r\n");
+      if (rawDataList[0].includes("ScummVM")) {
+        $("#init-next-2").removeClass("disabled-option");
+      } else {
+        $("#init-next-2").addClass("disabled-option");
+        $("#init-scummvm-executable-error").fadeIn(250);
+      }
+    })
   }
 });
 
 $("#init-choose-scummvm-config-path").on("click", () => {
+  $("#init-scummvm-config-error").fadeOut(250);
   let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
       "title": "Locate the ScummVM Configuration File",
       "message": "Locate the ScummVM Configuration File.",
@@ -154,8 +193,13 @@ $("#init-choose-scummvm-config-path").on("click", () => {
       ]
   })
   if (tempPath) {
-    $("#init-next-3").removeClass("disabled-option");
     $("#init-scummvm-config-path").html(tempPath);
+    if (!verifyScummvmConfigurationFile(tempPath)) {
+      $("#init-next-3").addClass("disabled-option");
+      $("#init-scummvm-config-error").fadeIn(250);
+    } else {
+      $("#init-next-3").removeClass("disabled-option");
+    }
   }
 });
 
@@ -1191,26 +1235,6 @@ function checkInitState() {
     getInstalledGames();
     getAudioDevices();
   }
-}
-
-function verifyScummvmExecutable(exePath) {
-  let launchOptions = ['--help'];
-  let rawData = "";
-  let scummvmFile = path.basename(exePath.toString());
-  let scummvmPath = path.dirname(exePath.toString());
-  let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
-  scummvm.stdout.on('data', (data) => {
-    rawData += data.toString();
-  });
-
-  scummvm.stderr.on('data', (data) => {
-  });
-
-  scummvm.on('exit', (code) => {
-    rawDataList = rawData.split("\r\n");
-    console.log(rawDataList[0].includes("ScummVM"));
-    return (rawDataList[0].includes("ScummVM"));
-  })
 }
 
 function verifyScummvmConfigurationFile(configPath) {
