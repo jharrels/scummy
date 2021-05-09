@@ -257,7 +257,7 @@ $(".launch-config").on("click", ".play", function(e) {
 
 $(".launch-config").on("click", ".remove", function(e) {
   let category = gameData[selectedGame]['category'];
-  let imagePath = `boxart/${category}/${selectedGame}.jpg`;
+  let imagePath = __dirname+`/boxart/${category}/${selectedGame}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -824,7 +824,7 @@ function drawCategories() {
 function drawGameInfo(gameId) {
   selectedGame = gameId;
   let category = gameData[gameId]['category'];
-  let imagePath = `boxart/${category}/${gameId}.jpg`;
+  let imagePath = __dirname+`/boxart/${category}/${gameId}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -904,7 +904,7 @@ function drawGames() {
     $(".main").html("").append(grid);
     tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
-      let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
+      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
@@ -928,7 +928,7 @@ function drawGames() {
     $(".main").html("").append(list);
     tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
-      let imagePath = `boxart/${category}/${longNames[key]}.jpg`;
+      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
@@ -1080,7 +1080,7 @@ function detectGame(gamePath) {
     if (parsedData) {
       let shortName = parsedData[1].trim();
       let category = gameData[shortName]['category'];
-      let imagePath = `boxart/${category}/${shortName}.jpg`;
+      let imagePath = __dirname+`/boxart/${category}/${shortName}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
