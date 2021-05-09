@@ -1,11 +1,13 @@
 {
   "name": "Scummy",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "description": "A front end for SCUMMVM.",
   "main": "init.js",
   "scripts": {
     "test": "electron .",
-    "build": "electron-packager . scummy --ignore=_original_box_art --overwrite --app-copyright='2021 Justin harrelson' --platform=win32 --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'"
+    "pack:win64": "electron-packager . Scummy  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=win32 --arch=x64 --icon=build_assets/icons/scummy.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
+    "pack:win32": "electron-packager . Scummy  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=win32 --arch=ia32 --icon=build_assets/icons/scummy.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
+    "build": "npm run pack:win64 && npm run pack:win32"
   },
   "author": "Justin Harrelson",
   "license": "MIT",

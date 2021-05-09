@@ -121,7 +121,7 @@ Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few ex
 * **0.8.0** - ~~Set default games.~~ :heavy_check_mark:
 * **0.9.0** - ~~Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).~~ :heavy_check_mark:
 * **0.10.0** - ~~GUI configuration options for Scummy.~~ :heavy_check_mark:
-* 0.11.0 - Get automated builds working.
+* **0.11.0** - ~~Get automated builds working.~~ :heavy_check_mark:
 * 1.0.0 - Release.
 
 Planned features:
