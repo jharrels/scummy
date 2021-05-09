@@ -1,11 +1,11 @@
 {
   "name": "Scummy",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "A front end for SCUMMVM.",
   "main": "init.js",
   "scripts": {
     "test": "electron .",
-    "build": "./node_modules/.bin/electron-builder build -m -w"
+    "build": "electron-packager . scummy --ignore=_original_box_art --overwrite --app-copyright='2021 Justin harrelson' --platform=win32 --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'"
   },
   "author": "Justin Harrelson",
   "license": "MIT",
