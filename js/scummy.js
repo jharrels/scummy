@@ -110,6 +110,10 @@ $("#change-scummvm-path").on("click", () => {
     let rawData = "";
     let scummvmFile = path.basename(tempPath.toString());
     let scummvmPath = path.dirname(tempPath.toString());
+    if (os.type() == 'Darwin') {
+      scummvmPath = tempPath+"/Contents/MacOS";
+      scummvmFile = "./scummvm";
+    }
     let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
     scummvm.stdout.on('data', (data) => {
       rawData += data.toString();
@@ -120,6 +124,7 @@ $("#change-scummvm-path").on("click", () => {
 
     scummvm.on('exit', (code) => {
       rawDataList = rawData.split("\r\n");
+      if (os.type() == "Darwin") rawDataList = rawData.split("\n");
       if (rawDataList[0].includes("ScummVM")) {
         $("#scummy-configure-modal-save").removeClass("disabled-option");
       } else {
@@ -163,17 +168,23 @@ $("#init-scummvm-path").on("click", () => {
     let rawData = "";
     let scummvmFile = path.basename(tempPath.toString());
     let scummvmPath = path.dirname(tempPath.toString());
+    if (os.type() == 'Darwin') {
+      scummvmPath = tempPath+"/Contents/MacOS";
+      scummvmFile = "./scummvm";
+    }
     let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
     scummvm.stdout.on('data', (data) => {
       rawData += data.toString();
     });
 
     scummvm.stderr.on('data', (data) => {
+      rawData += data.toString();
     });
 
     scummvm.on('exit', (code) => {
       rawDataList = rawData.split("\r\n");
-      if (rawDataList[0].includes("ScummVM")) {
+      if (os.type() == "Darwin") rawDataList = rawData.split("\n");
+      if ((rawDataList[0].includes("ScummVM")) || (rawDataList[1].includes("ScummVM"))) {
         $("#init-next-2").removeClass("disabled-option");
       } else {
         $("#init-next-2").addClass("disabled-option");
@@ -647,6 +658,10 @@ function launchGame(gameId, shortName) {
   let rawData = "";
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  if (os.type() == 'Darwin') {
+    scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
+    scummvmFile = "./scummvm";
+  }
   let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   showWaiting(installed[gameId]['name']);
   scummvm.stdout.on('data', (data) => {
@@ -951,6 +966,10 @@ function getInstalledGames() {
   let rawData = "";
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  if (os.type() == 'Darwin') {
+    scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
+    scummvmFile = "./scummvm";
+  }
   let scummvm = spawn(scummvmFile, ['--list-targets'], {'cwd': scummvmPath, 'shell': true});
 
   scummvm.stdout.on('data', (data) => {
@@ -958,11 +977,11 @@ function getInstalledGames() {
   });
 
   scummvm.stderr.on('data', (data) => {
-    console.error(data.toString());
   });
 
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
+    if (os.type() == "Darwin") rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length-1; i++) {
       let parsedData = rawDataList[i].match(/(.+?)[ ]{2,}(.+)$/);
       let rawGameId = parsedData[1];
@@ -1066,6 +1085,10 @@ function detectGame(gamePath) {
   let rawData = "";
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  if (os.type() == 'Darwin') {
+    scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
+    scummvmFile = "./scummvm";
+  }
   let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -1076,6 +1099,7 @@ function detectGame(gamePath) {
 
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
+    if (os.type() == "Darwin") rawDataList = rawData.split("\n");
     let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
     if (parsedData) {
       let shortName = parsedData[1].trim();
@@ -1135,6 +1159,10 @@ function importGame(gamePath) {
   let rawData = "";
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  if (os.type() == 'Darwin') {
+    scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
+    scummvmFile = "./scummvm";
+  }
   let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -1156,6 +1184,10 @@ function getAudioDevices() {
   let rawData = "";
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
+  if (os.type() == 'Darwin') {
+    scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
+    scummvmFile = "./scummvm";
+  }
   let scummvm = spawn(scummvmFile, launchOptions, {'cwd': scummvmPath, 'shell': true});
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -1166,6 +1198,7 @@ function getAudioDevices() {
 
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
+    if (os.type() == "Darwin") rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length; i++) {
       let parsedData = rawDataList[i].match(/"(.+?)"(.+)/);
       if (parsedData) {
