@@ -9,6 +9,16 @@ html {
     user-select:none;
 }
 
+.titlebar {
+  height: 30px !important;
+}
+
+.container-after-titlebar {
+  inset: 30px 0px 0px !important;
+  position: absolute !important;
+  overflow: hidden !important;
+}
+
 .sideBar {
   background-color: #1B262C;
   width: 300px;
