@@ -3,6 +3,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs')
 const { remote } = require('electron')
+const app = remote.app
 const { Menu, MenuItem } = remote
 const electron = require('electron');
 const { spawn } = require('child_process');
@@ -124,7 +125,7 @@ $("#change-scummvm-path").on("click", () => {
 
     scummvm.on('exit', (code) => {
       rawDataList = rawData.split("\r\n");
-      if (os.type() == "Darwin") rawDataList = rawData.split("\n");
+      if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
       if (rawDataList[0].includes("ScummVM")) {
         $("#scummy-configure-modal-save").removeClass("disabled-option");
       } else {
@@ -183,7 +184,7 @@ $("#init-scummvm-path").on("click", () => {
 
     scummvm.on('exit', (code) => {
       rawDataList = rawData.split("\r\n");
-      if (os.type() == "Darwin") rawDataList = rawData.split("\n");
+      if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
       if ((rawDataList[0].includes("ScummVM")) || (rawDataList[1].includes("ScummVM"))) {
         $("#init-next-2").removeClass("disabled-option");
       } else {
@@ -981,7 +982,7 @@ function getInstalledGames() {
 
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
-    if (os.type() == "Darwin") rawDataList = rawData.split("\n");
+    if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length-1; i++) {
       let parsedData = rawDataList[i].match(/(.+?)[ ]{2,}(.+)$/);
       let rawGameId = parsedData[1];
@@ -1038,6 +1039,7 @@ function getScummvmConfigPath() {
   let scummvmConfigPath = "";
   if (os.type() == 'Windows_NT') scummvmConfigPath = process.env.APPDATA+"\\ScummVM\\scummvm.ini";
   if (os.type() == 'Darwin') scummvmConfigPath = process.env.HOME+"/Library/Preferences/ScummVM Preferences";
+  if (os.type() == 'Linux') scummvmConfigPath = process.env.HOME+"/.config/scummvm/scummvm.ini";
   return scummvmConfigPath;
 }
 
@@ -1063,10 +1065,10 @@ function hideWaiting() {
 
 function writeTempConfig(shortName) {
     let tempConfig = [];
-
     let lineEnd;
     if (os.type() == 'Windows_NT') tempConfigPath = process.env.APPDATA+"\\Scummy\\temp.ini";
     if (os.type() == 'Darwin') tempConfigPath = process.env.HOME+"/Library/Preferences/Scummy";
+    if (os.type() == 'Linux') tempConfigPath = app.getPath(userData);
     tempConfig.push("[scummvm]");
     Object.keys(scummvmConfig['scummvm']).forEach(key => {
       tempConfig.push(`${key}=${scummvmConfig['scummvm'][key]}`);
@@ -1099,7 +1101,7 @@ function detectGame(gamePath) {
 
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
-    if (os.type() == "Darwin") rawDataList = rawData.split("\n");
+    if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
     let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
     if (parsedData) {
       let shortName = parsedData[1].trim();
@@ -1198,7 +1200,7 @@ function getAudioDevices() {
 
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
-    if (os.type() == "Darwin") rawDataList = rawData.split("\n");
+    if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length; i++) {
       let parsedData = rawDataList[i].match(/"(.+?)"(.+)/);
       if (parsedData) {
