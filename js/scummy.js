@@ -984,7 +984,7 @@ function getInstalledGames() {
     rawDataList = rawData.split("\r\n");
     if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length-1; i++) {
-      let parsedData = rawDataList[i].match(/(.+?)[ ]{2,}(.+)$/);
+      let parsedData = rawDataList[i].match(/(.+?)[ ]{1,}(.+)$/);
       let rawGameId = parsedData[1];
       let parsedGameName;
       if (parsedData[2].includes("(")) {
