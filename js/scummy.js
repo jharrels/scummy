@@ -937,6 +937,11 @@ function drawGames() {
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
+      try {
+        fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
+      } catch(err) {
+        $(`#${longNames[key]}`).addClass("disabled");
+      }
     });
   }
   if (listMode == "list") {
@@ -956,8 +961,14 @@ function drawGames() {
         if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
       }
       let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
+      let sdefault = defaultVersion[longNames[key]];
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#list").append(rowObj);
+      try {
+        fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
+      } catch(err) {
+        $(`#${longNames[key]}`).addClass("disabled");
+      }
     });
   }
 }
