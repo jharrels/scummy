@@ -1,3 +1,13 @@
+# NOTE: Discontinued.
+
+## The ScumMVM team has announced that one of the projects for the 2021 Google Summer of Code is to "improve the GUI by adding a graphical interface for game library management, so that games are displayed with cover art thumbnails, grouping options and various filtering fields." Sounds familiar, doesn't it?
+
+As of now, I'm halting work on Scummy. I see no need in putting time into something that is essentially going to be available built right into ScummVM.
+
+
+
+
+
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
