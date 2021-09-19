@@ -178,7 +178,6 @@ Project Link: [https://github.com/jharrels/scummy](https://github.com/jharrels/s
 
 
 
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/jharrels/scummy.svg?style=for-the-badge
