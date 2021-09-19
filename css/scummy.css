@@ -263,6 +263,15 @@ html {
   text-align: center;
 }
 
+#grid>div.disabled {
+  opacity: 0.5;
+  cursor: no-drop;
+}
+
+#grid>div.disabled img {
+  filter: saturate(0);
+}
+
 #grid>div img:hover {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
@@ -273,6 +282,18 @@ html {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.03, 1.03);
+}
+
+#grid>div.disabled img:hover {
+  filter: saturate(0);
+  transition: none;
+  transform: none;
+}
+
+#grid>div.disabled img.active {
+  filter: saturate(0);
+  transition: none;
+  transform: none;
 }
 
 #list>div {
@@ -306,6 +327,14 @@ html {
   left: 0;
 }
 
+#list>div.disabled {
+  opacity: 0.5;
+}
+
+#list>div.disabled img {
+  filter: saturate(0);
+}
+
 #list>div.game:hover {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
@@ -329,10 +358,16 @@ html {
   transform: scale(1.15, 1.15);
 }
 
-#grid>div img.active {
-  filter: brightness(1.2) contrast(1.0);
-  transition: all .25s;
-  transform: scale(1.03, 1.03);
+#list>div.game.disabled img:hover {
+  filter: saturate(0);
+  transition: none;
+  transform: none;
+}
+
+#list>div.game.disabled img.active {
+  filter: saturate(0);
+  transition: none;
+  transform: none;
 }
 
 /*----------------------------------------

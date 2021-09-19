@@ -645,6 +645,13 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
+  if ($(`#${gameId}`).hasClass("disabled")) {
+    alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
+    $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
+    $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("Data for this game is missing!");
+    showModal("#unknown-modal");
+    return;
+  }
   let lastPosition = recentList.indexOf(gameId);
   if (lastPosition > -1) recentList.splice(lastPosition, 1);
   recentList.unshift(gameId);
@@ -937,6 +944,11 @@ function drawGames() {
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#grid").append(rowObj);
+      try {
+        fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
+      } catch(err) {
+        $(`#${longNames[key]}`).addClass("disabled");
+      }
     });
   }
   if (listMode == "list") {
@@ -956,8 +968,14 @@ function drawGames() {
         if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
       }
       let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
+      let sdefault = defaultVersion[longNames[key]];
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#list").append(rowObj);
+      try {
+        fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
+      } catch(err) {
+        $(`#${longNames[key]}`).addClass("disabled");
+      }
     });
   }
 }
