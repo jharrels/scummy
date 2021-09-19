@@ -265,6 +265,7 @@ html {
 
 #grid>div.disabled {
   opacity: 0.5;
+  cursor: no-drop;
 }
 
 #grid>div.disabled img {

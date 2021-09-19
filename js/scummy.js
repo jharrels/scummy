@@ -645,6 +645,13 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
+  if ($(`#${gameId}`).hasClass("disabled")) {
+    alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
+    $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
+    $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("Data for this game is missing!");
+    showModal("#unknown-modal");
+    return;
+  }
   let lastPosition = recentList.indexOf(gameId);
   if (lastPosition > -1) recentList.splice(lastPosition, 1);
   recentList.unshift(gameId);
