@@ -36,6 +36,8 @@ let titlebar = new customTitlebar.Titlebar({
 ---------------------------------------------------------------------------- */
 var listMode = store.get('listMode');
 if (listMode === undefined) listMode = "gallery";
+var groupItems = store.get('groupItems');
+if (groupItems === undefined) groupItems = false;
 var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
 var defaultVersion = store.get('defaultVersion');
@@ -48,6 +50,7 @@ var scummyConfig = store.get('scummyConfig');
 if (scummyConfig === undefined) scummyConfig = {};
 
 $(`#${listMode}-view`).addClass("active");
+if (groupItems) $("#group-items").addClass("active");
 
 parseScummyConfig();
 checkInitState();
@@ -234,6 +237,20 @@ $("#gallery-view").on("click", () => {
     $("#gallery-view").addClass("active");
     listMode = "gallery";
     store.set('listMode', listMode);
+    drawGames();
+  }
+});
+
+$("#group-items").on("click", () => {
+  if (!$("#group-items").hasClass("active")) {
+    $("#group-items").addClass("active");
+    groupItems = true;
+    store.set('groupItems', groupItems);
+    drawGames();
+  } else {
+    $("#group-items").removeClass("active");
+    groupItems = false;
+    store.set('groupItems', groupItems);
     drawGames();
   }
 });
@@ -895,8 +912,9 @@ function drawGameInfo(gameId) {
 }
 
 function drawGames() {
-  $("#grid").remove();
-  $("#list").remove();
+  $(".grid").remove();
+  $(".list").remove();
+  $(".group-header").remove();
   let longNames = {};
   if (selectedCategory == "recent") {
     recentList.forEach(key => {
@@ -904,80 +922,93 @@ function drawGames() {
         longNames[installed[key]['name']] = key;
       }
     });
+    drawGrid(longNames);
   }
   if (selectedCategory == "all") {
-    Object.keys(installed).forEach(key => {
-      longNames[installed[key]['name']] = key;
-    });
+    if (groupItems) {
+      Object.keys(categories).forEach(key => {
+        longNames = {};
+        Object.keys(installed).forEach(installKey => {
+          if (gameData[installKey]['category'] == key) longNames[installed[installKey]['name']] = installKey;
+        });
+        if (Object.keys(longNames).length > 0) drawGrid(longNames, key);
+      });
+    } else {
+      Object.keys(installed).forEach(key => {
+        longNames[installed[key]['name']] = key;
+      });
+      drawGrid(longNames);
+    }
   }
   if (selectedCategory == "favorites") {
-    favorites.forEach(key => {
-      longNames[installed[key]['name']] = key;
-    });
+    if (groupItems) {
+      Object.keys(categories).forEach(key => {
+        longNames = {};
+        favorites.forEach(favoriteKey => {
+          if (gameData[favoriteKey]['category'] == key) longNames[installed[favoriteKey]['name']] = favoriteKey;
+        });
+        if (Object.keys(longNames).length > 0) drawGrid(longNames, key);
+      });
+    } else {
+      favorites.forEach(key => {
+        longNames[installed[key]['name']] = key;
+      });
+      drawGrid(longNames);
+    }
   }
   if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
     Object.keys(installed).forEach(key => {
       if (selectedCategory == gameData[key]['category']) longNames[installed[key]['name']] = key;
     });
+    if (groupItems) {
+      drawGrid(longNames, selectedCategory);
+    } else {
+      drawGrid(longNames);
+    }
+  }
+}
+
+function drawGrid(longNames, categoryId) {
+  if (typeof categoryId === "string") {
+    let groupHeader = $("<div></div>", {"class": "group-header"})
+      .html(categories[categoryId]);
+    $(".main").append(groupHeader);
+  if ($(".group-header").length == 1) $(".group-header").addClass("first");
   }
   let tempGameList = Object.keys(longNames);
+  console.log(tempGameList);
   if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
-  if (listMode == "gallery") {
-    let grid = $("<div></div>", {"id": "grid"});
-    $(".main").html("").append(grid);
-    tempGameList.forEach(key => {
-      let category = gameData[longNames[key]]['category'];
-      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
-      try {
-        fs.accessSync(imagePath, fs.constants.R_OK);
-      } catch(err) {
-        console.log(`Missing: boxart/${category}/${longNames[key]}.jpg`);
-         imagePath = "boxart/missing.jpg";
-      }
-      let gameImageObj = $("<img></img", {"src": imagePath});
-      let favoriteObj = "";
-      if (scummyConfig['showFavoriteIcon']) {
-        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
-      }
-      let gameNameObj;
-      if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
-      let sdefault = defaultVersion[longNames[key]];
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
-      $("#grid").append(rowObj);
-      try {
-        fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
-      } catch(err) {
-        $(`#${longNames[key]}`).addClass("disabled");
-      }
-    });
-  }
-  if (listMode == "list") {
-    let list = $("<div></div>", {"id": "list"});
-    $(".main").html("").append(list);
-    tempGameList.forEach(key => {
-      let category = gameData[longNames[key]]['category'];
-      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
-      try {
-        fs.accessSync(imagePath, fs.constants.R_OK);
-      } catch(err) {
-         imagePath = "boxart/missing.jpg";
-      }
-      let gameImageObj = $("<img></img", {"src": imagePath});
-      let favoriteObj = "";
-      if (scummyConfig['showFavoriteIcon']) {
-        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
-      }
-      let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
-      let sdefault = defaultVersion[longNames[key]];
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
-      $("#list").append(rowObj);
-      try {
-        fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
-      } catch(err) {
-        $(`#${longNames[key]}`).addClass("disabled");
-      }
-    });
-  }
+  let gridClass;
+  if (listMode == "gallery") gridClass = "grid";
+  if (listMode == "list") gridClass = "list";
+  let gridNumber = gridClass+$(`.${gridClass}`).length + 1;
+  let grid = $("<div></div>", {"class": `${gridClass} ${gridNumber}`});
+  $(".main").append(grid);
+  tempGameList.forEach(key => {
+    let category = gameData[longNames[key]]['category'];
+    let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
+    try {
+      fs.accessSync(imagePath, fs.constants.R_OK);
+    } catch(err) {
+      console.log(`Missing: boxart/${category}/${longNames[key]}.jpg`);
+       imagePath = "boxart/missing.jpg";
+    }
+    let gameImageObj = $("<img></img", {"src": imagePath});
+    let favoriteObj = "";
+    if (scummyConfig['showFavoriteIcon']) {
+      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+    }
+    let gameNameObj;
+    if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
+    let sdefault = defaultVersion[longNames[key]];
+    let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
+    $(`.${gridNumber}`).append(rowObj);
+    try {
+      fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
+    } catch(err) {
+      $(`#${longNames[key]}`).addClass("disabled");
+    }
+  });
 }
 
 function getInstalledGames() {
