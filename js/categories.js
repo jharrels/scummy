@@ -17,6 +17,7 @@ var categories = {
   "other": "Other Games",
   "nwc": "New World Computing",
   "polarware": "Polarware",
+  "presto": "Presto Studios",
   "revolution": "Revolution Studios",
   "sierra": "Sierra",
   "tsunami": "Tsunami Games",
