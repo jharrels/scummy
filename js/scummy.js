@@ -23,6 +23,85 @@ var selectedConfig = "";
 var importGamePath = "";
 var audioDevices = [];
 
+const template = [
+   {
+      label: 'Edit',
+      submenu: [
+         {
+            role: 'undo'
+         },
+         {
+            role: 'redo'
+         },
+         {
+            type: 'separator'
+         },
+         {
+            role: 'cut'
+         },
+         {
+            role: 'copy'
+         },
+         {
+            role: 'paste'
+         }
+      ]
+   },
+
+   {
+      label: 'View',
+      submenu: [
+         {
+            role: 'reload'
+         },
+         {
+            role: 'toggledevtools'
+         },
+         {
+            type: 'separator'
+         },
+         {
+            role: 'resetzoom'
+         },
+         {
+            role: 'zoomin'
+         },
+         {
+            role: 'zoomout'
+         },
+         {
+            type: 'separator'
+         },
+         {
+            role: 'togglefullscreen'
+         }
+      ]
+   },
+
+   {
+      role: 'window',
+      submenu: [
+         {
+            role: 'minimize'
+         },
+         {
+            role: 'close'
+         }
+      ]
+   },
+
+   {
+      role: 'help',
+      submenu: [
+         {
+            label: 'Learn More'
+         }
+      ]
+   }
+]
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu);
 //Menu.setApplicationMenu(null);
 
 let titlebar = new customTitlebar.Titlebar({
@@ -286,7 +365,7 @@ $(".launch-config").on("click", ".play", function(e) {
 
 $(".launch-config").on("click", ".remove", function(e) {
   let category = gameData[selectedGame]['category'];
-  let imagePath = __dirname+`/boxart/${category}/${selectedGame}.jpg`;
+  let imagePath = __dirname+`/${category}/${selectedGame}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -864,7 +943,7 @@ function drawCategories() {
 function drawGameInfo(gameId) {
   selectedGame = gameId;
   let category = gameData[gameId]['category'];
-  let imagePath = __dirname+`/boxart/${category}/${gameId}.jpg`;
+  let imagePath = __dirname+`/boxart/${gameId}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -986,11 +1065,11 @@ function drawGrid(longNames, categoryId) {
   $(".main").append(grid);
   tempGameList.forEach(key => {
     let category = gameData[longNames[key]]['category'];
-    let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
+    let imagePath = __dirname+`/boxart/${longNames[key]}.jpg`;
     try {
       fs.accessSync(imagePath, fs.constants.R_OK);
     } catch(err) {
-      console.log(`Missing: boxart/${category}/${longNames[key]}.jpg`);
+      console.log(`Missing: boxart/${longNames[key]}.jpg`);
        imagePath = "boxart/missing.jpg";
     }
     let gameImageObj = $("<img></img", {"src": imagePath});
@@ -1149,22 +1228,44 @@ function detectGame(gamePath) {
   });
 
   scummvm.on('exit', (code) => {
+    if (!rawData.includes("GameID")) {
+      alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
+      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
+      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("No game was detected.");
+      showModal("#unknown-modal");
+      return;
+    }
+    console.log(rawData);
     rawDataList = rawData.split("\r\n");
     if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
-    let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
+    let tempParsedData = [];
+    let foundHeader = false;
+    for (i=0; i<rawDataList.length; i++) {
+      if (rawDataList[i].includes("GameID")) {
+        foundHeader = true;
+      }
+      if (foundHeader) {
+        tempParsedData.push(rawDataList[i]);
+      }
+    }
+
+    let parsedData = tempParsedData[2].match(/.+?:(.+?)[ ].+?([a-zA-Z0-9].+?)[ ]([a-zA-Z]:|\/)/);
+    console.log(parsedData);
+    //let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
     if (parsedData) {
       let shortName = parsedData[1].trim();
+      let fullName = parsedData[2].trim();
       let category = gameData[shortName]['category'];
-      let imagePath = __dirname+`/boxart/${category}/${shortName}.jpg`;
+      let imagePath = __dirname+`/boxart/${shortName}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
          imagePath = "boxart/missing.jpg";
       }
-      if (parsedData[2].includes("(")) {
-        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+      if (fullName.includes("(")) {
+        parsedGameName = fullName.match(/^(.+?)\((.+?)\)$/);
       } else {
-        parsedGameName = ["", parsedData[2], "Default"];
+        parsedGameName = ["", fullName, ""];
       }
       let alreadyInstalled = false;
       if (shortName in installed) {
@@ -1196,11 +1297,6 @@ function detectGame(gamePath) {
         $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A game has been detected. Would you like to import it?");
         showModal("#add-modal");
       }
-    } else {
-      alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
-      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
-      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("No game was detected.");
-      showModal("#unknown-modal");
     }
   })
 }
