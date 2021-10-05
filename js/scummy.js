@@ -521,7 +521,9 @@ $(".main").on("contextmenu", ".game", function(e) {
     $("#context-menu").find(".favorite").html("<i class='fas fa-heart fa-fw'></i> Favorite").removeClass("active");
   }
   $("#context-menu").children(".manage").attr("id", gameId);
-  $("#context-menu").css({left: e.pageX-50, top: e.pageY-50}).fadeIn(250);
+  let menuLeft = e.pageX-50;
+  if (menuLeft + $("#context-menu").width() > $("body").width()) menuLeft = $("body").width() - $("#context-menu").width() - 20;
+  $("#context-menu").css({left: menuLeft, top: e.pageY-50}).fadeIn(250);
 });
 
 $("#context-menu").on("mouseleave", () => {
