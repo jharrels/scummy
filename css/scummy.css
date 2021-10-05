@@ -40,8 +40,9 @@ html {
 }
 
 .sideBarItem {
-  margin-left: 30px;
-  padding: 5px 0;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 5px 10px;
   font-family: sans-serif;
   font-size: 15px;
   color: white;
@@ -76,6 +77,11 @@ html {
   opacity: 1.0;
 }
 
+.sideBarItem:hover {
+  background-color: rgba(255, 255, 255, .1);
+  border-radius: 3px;
+}
+
 .sideBarItem i {
   opacity: 0.5;
   padding-right: 5px;
@@ -83,7 +89,7 @@ html {
 
 .sideBarItem > .badge {
   display: inline-block;
-  margin-left: 5px;
+  float: right;
   background: white;
   color: #1B262C;
   padding: 0 10px;
